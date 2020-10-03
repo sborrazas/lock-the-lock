@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    working_dir: /app
+    environment:
+      - LOCK_SECRET=893e83fa0013385664d7c3346cecc34b
+    volumes:
+      - .:/app:delegated
+      - ~/.ssh:/root/.ssh:cached
+      - shared_vol:/shared
+    command: mix phx.server
+volumes:
+  shared_vol:

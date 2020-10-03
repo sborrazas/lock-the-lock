@@ -22,7 +22,6 @@ defmodule LockTheLockWeb do
       use Phoenix.Controller, namespace: LockTheLockWeb
 
       import Plug.Conn
-      import LockTheLockWeb.Gettext
       alias LockTheLockWeb.Router.Helpers, as: Routes
     end
   end
@@ -54,7 +53,6 @@ defmodule LockTheLockWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import LockTheLockWeb.Gettext
     end
   end
 
@@ -67,7 +65,6 @@ defmodule LockTheLockWeb do
       import Phoenix.View
 
       import LockTheLockWeb.ErrorHelpers
-      import LockTheLockWeb.Gettext
       alias LockTheLockWeb.Router.Helpers, as: Routes
     end
   end

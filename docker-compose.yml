@@ -6,11 +6,14 @@ services:
       dockerfile: Dockerfile.app
     working_dir: /app
     environment:
+      - SHARED_DIR=/shared
       - LOCK_SECRET=893e83fa0013385664d7c3346cecc34b
     volumes:
       - .:/app:delegated
       - ~/.ssh:/root/.ssh:cached
       - shared_vol:/shared
+    ports:
+      - "4000:4000"
     command: mix phx.server
 volumes:
   shared_vol:

@@ -8,6 +8,8 @@ defmodule LockTheLock.MixProject do
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix] ++ Mix.compilers(),
+      build_path: dir("_build"),
+      deps_path: dir("deps"),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -54,5 +56,9 @@ defmodule LockTheLock.MixProject do
     [
       setup: ["deps.get"]
     ]
+  end
+
+  defp dir(path) do
+    Path.join(System.get_env("SHARED_DIR", "."), path)
   end
 end

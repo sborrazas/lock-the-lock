@@ -8,7 +8,7 @@ DOCKER_OPTS ?=
 
 .PHONY: start
 start:
-	docker-compose up app
+	docker-compose up
 
 .PHONY: shell
 shell:

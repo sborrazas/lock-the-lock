@@ -21,5 +21,10 @@ services:
     volumes:
       - .:/app:delegated
       - shared_vol:/shared
+    ports:
+      - "3000:3000"
+    entrypoint: yarn
+    command: start
+    tty: true # The server stops on EOF
 volumes:
   shared_vol:

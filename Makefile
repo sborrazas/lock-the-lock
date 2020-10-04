@@ -8,7 +8,7 @@ DOCKER_OPTS ?=
 
 .PHONY: start
 start:
-	docker-compose up
+	docker-compose up app
 
 .PHONY: shell
 shell:
@@ -50,3 +50,15 @@ define execute_with_keys
 																	 ssh-add ~/.ssh/id_rsa && \
 																	 $(1)"
 endef
+
+
+################################################################################
+# Frontend Makefile API
+################################################################################
+
+.PHONY: frontend-shell
+frontend-shell:
+	docker-compose run --rm \
+										 $(DOCKER_OPTS) \
+										 frontend \
+										 /bin/bash

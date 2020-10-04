@@ -15,5 +15,11 @@ services:
     ports:
       - "4000:4000"
     command: mix phx.server
+  frontend:
+    image: node:14.12.0
+    working_dir: /app/assets
+    volumes:
+      - .:/app:delegated
+      - shared_vol:/shared
 volumes:
   shared_vol:

@@ -14,7 +14,7 @@ defmodule LockTheLockWeb.Endpoint do
     websocket: true,
     longpoll: false
 
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  plug Plug.Static.IndexHtml, at: "/"
 
   # Serve at "/" the static files from "priv/static" directory.
   #

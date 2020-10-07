@@ -24,7 +24,12 @@ defmodule LockTheLockWeb.Endpoint do
     at: "/",
     from: :lock_the_lock,
     gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only: ~w(index.html css fonts images js favicon.ico robots.txt)
+
+  # :code_reloader configuration of your endpoint.
+  if code_reloading? do
+    plug Phoenix.CodeReloader
+  end
 
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]

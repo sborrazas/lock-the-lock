@@ -1,4 +1,4 @@
-FROM node:14.12.0
+FROM node:14.12.0 AS assets
 
 ADD ./assets /app
 WORKDIR /app
@@ -17,8 +17,9 @@ RUN mix local.hex --force
 # Install rebar
 RUN mix local.rebar --force
 
-# Add app
+# Add app & assets
 ADD . /app
+COPY --from=assets /app/build/static /app/priv/static
 WORKDIR /app
 
 # Set env

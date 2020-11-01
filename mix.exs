@@ -12,7 +12,14 @@ defmodule LockTheLock.MixProject do
       deps_path: dir("deps"),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: [
+        lock_the_lock: [
+          include_executables_for: [:unix],
+          applications: [runtime_tools: :permanent],
+          version: System.fetch_env!("VERSION")
+        ]
+      ]
     ]
   end
 

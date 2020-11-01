@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+    - amazon.aws.s3_bucket:
+        name: "{{ terraform_state_bucket }}"
+        state: present

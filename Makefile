@@ -58,7 +58,12 @@ endef
 
 .PHONY: frontend-shell
 frontend-shell:
-	docker-compose run --rm \
-										 $(DOCKER_OPTS) \
-										 frontend \
-										 /bin/bash
+	docker-compose run --rm $(DOCKER_OPTS) frontend /bin/bash
+
+################################################################################
+# Infrastructure Makefile API
+################################################################################
+
+.PHONY: infrastructure-shell
+infrastructure-shell:
+	docker-compose run --rm $(DOCKER_OPTS) infrastructure

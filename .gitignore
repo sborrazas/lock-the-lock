@@ -26,3 +26,7 @@ lock_the_lock-*.tar
 /assets/node_modules
 
 /assets/dist/js/*.js
+
+.terragrunt-cache
+
+/infrastructure/collections/ansible_collections

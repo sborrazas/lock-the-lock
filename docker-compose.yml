@@ -26,5 +26,16 @@ services:
     entrypoint: ""
     command: yarn start
     tty: true # The server stops on EOF
+  infrastructure:
+    build:
+      context: .
+      dockerfile: Dockerfile.infrastructure
+    working_dir: /app/infrastructure
+    volumes:
+      - .:/app:delegated
+      - ~/.ssh:/root/.ssh:cached
+      - ~/.aws:/root/.aws
+    entrypoint:
+      ["/bin/bash", "-c", "eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa && /bin/bash"]
 volumes:
   shared_vol:

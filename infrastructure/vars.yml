@@ -1,0 +1,7 @@
+---
+app_name: lock-the-lock
+terraform_state_s3_bucket: lock-the-lock-terraform-state
+aws_region: us-east-1
+domain: fandf.io
+subdomain: lock.fandf.io
+administrator_arn: arn:aws:iam::682042802783:user/lock-the-lock

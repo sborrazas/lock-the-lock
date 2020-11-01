@@ -1,0 +1,30 @@
+FROM ubuntu:xenial
+
+# UTILS
+RUN apt-get -y update && \
+    apt-get install -y git openssh-client
+
+################################################################################
+# ANSIBLE
+################################################################################
+
+# Install ansible and ansible deps
+RUN apt-get install -y python3 python3-pip
+
+# Upgrade pip
+RUN python3 -m pip install --upgrade pip
+
+RUN pip install ansible boto boto3 botocore python-dateutil
+
+################################################################################
+# TERRAFORM + TERRAGRUNT
+################################################################################
+RUN apt-get -y update && \
+    apt-get install -y wget unzip
+
+RUN wget -q -O tmp.zip https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip && \
+  unzip tmp.zip -d /usr/local/bin && \
+  rm tmp.zip
+
+RUN wget -q -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v0.25.5/terragrunt_linux_amd64 && \
+  chmod +x /usr/local/bin/terragrunt

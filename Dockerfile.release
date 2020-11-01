@@ -24,6 +24,7 @@ WORKDIR /app
 # Set env
 ENV MIX_ENV prod
 ENV VERSION $APP_VERSION
+ENV APP_PORT 3000
 
 # Install deps
 RUN mix deps.get --only prod
@@ -31,4 +32,7 @@ RUN mix deps.get --only prod
 # Build release
 RUN mix release lock_the_lock
 
-ENTRYPOINT ["/app/_build/rel/lock_the_lock/bin/lock_the_lock", "start"]
+# Run
+EXPOSE 3000
+
+ENTRYPOINT ["/app/_build/prod/rel/lock_the_lock/bin/lock_the_lock", "start"]

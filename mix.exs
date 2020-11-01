@@ -17,7 +17,7 @@ defmodule LockTheLock.MixProject do
         lock_the_lock: [
           include_executables_for: [:unix],
           applications: [runtime_tools: :permanent],
-          version: System.fetch_env!("VERSION")
+          version: System.fetch_env!("APP_VERSION")
         ]
       ]
     ]

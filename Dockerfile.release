@@ -7,7 +7,7 @@ RUN npm install
 
 RUN npm run build
 
-FROM elixir:1.10.4
+FROM elixir:1.11.1
 
 ARG APP_VERSION
 
@@ -23,7 +23,7 @@ WORKDIR /app
 
 # Set env
 ENV MIX_ENV prod
-ENV VERSION $APP_VERSION
+ENV APP_VERSION $APP_VERSION
 ENV APP_PORT 3000
 
 # Install deps

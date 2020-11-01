@@ -7,6 +7,7 @@ services:
     working_dir: /app
     environment:
       - SHARED_DIR=/shared
+      - APP_VERSION=0.0.0
       - APP_HOST=localhost
       - APP_SECRET_KEY_BASE="m9uyofMZTKL76t+FzUfc8d6XnNAKpCYhNcBdinFRsYkXQ+g3vst/BJF9yFfUoQnW"
     volumes:

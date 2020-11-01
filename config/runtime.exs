@@ -1,3 +1,5 @@
+import Config
+
 env = System.fetch_env!("MIX_ENV")
 debug? = env in ["test", "dev"]
 

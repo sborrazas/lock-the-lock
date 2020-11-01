@@ -22,11 +22,11 @@ ADD . /app
 WORKDIR /app
 
 # Set env
-ENV MIX_ENV production
+ENV MIX_ENV prod
 ENV VERSION $APP_VERSION
 
 # Install deps
-RUN mix deps.get --only production
+RUN mix deps.get --only prod
 
 # Build release
 RUN mix release lock_the_lock

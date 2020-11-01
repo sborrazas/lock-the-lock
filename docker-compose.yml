@@ -7,7 +7,8 @@ services:
     working_dir: /app
     environment:
       - SHARED_DIR=/shared
-      - LOCK_SECRET=893e83fa0013385664d7c3346cecc34b
+      - APP_HOST=localhost
+      - APP_SECRET_KEY_BASE="m9uyofMZTKL76t+FzUfc8d6XnNAKpCYhNcBdinFRsYkXQ+g3vst/BJF9yFfUoQnW"
     volumes:
       - .:/app:delegated
       - ~/.ssh:/root/.ssh:cached

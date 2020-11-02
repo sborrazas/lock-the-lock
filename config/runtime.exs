@@ -16,4 +16,5 @@ config :lock_the_lock, LockTheLockWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   debug_errors: debug?,
   code_reloader: debug?,
-  check_origin: !debug?
+  check_origin: !debug?,
+  server: !debug?

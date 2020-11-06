@@ -7,7 +7,7 @@ RUN npm install
 
 RUN npm run build
 
-FROM elixir:1.11.1
+FROM elixir:1.11.1 AS build
 
 ARG APP_VERSION
 
@@ -36,7 +36,15 @@ RUN mix phx.digest
 # Build release
 RUN mix release lock_the_lock
 
+FROM elixir:1.11.1
+
+# Set env
+ENV MIX_ENV prod
+ENV APP_PORT 3000
+
+COPY --from=build /app/_build/prod/rel/lock_the_lock /app
+
 # Run
 EXPOSE 3000
 
-ENTRYPOINT ["/app/_build/prod/rel/lock_the_lock/bin/lock_the_lock", "start"]
+ENTRYPOINT ["/app/bin/lock_the_lock", "start"]

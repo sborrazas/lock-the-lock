@@ -5,12 +5,16 @@ on:
     paths:
     - lib/**
     - assets/**
+    - Dockerfile.release
+    - mix.exs
     branches:
     - master
   push:
     paths:
     - lib/**
     - assets/**
+    - Dockerfile.release
+    - mix.exs
     branches:
     - master
 

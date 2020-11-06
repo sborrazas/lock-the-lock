@@ -30,6 +30,9 @@ ENV APP_PORT 3000
 # Install deps
 RUN mix deps.get --only prod
 
+# Digest assets
+RUN mix phx.digest
+
 # Build release
 RUN mix release lock_the_lock
 

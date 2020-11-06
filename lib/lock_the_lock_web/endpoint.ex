@@ -22,9 +22,8 @@ defmodule LockTheLockWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :lock_the_lock,
-    gzip: false,
-    only: ~w(index.html css fonts images js favicon.ico robots.txt)
+    from: {:lock_the_lock, "priv/static"},
+    gzip: true
 
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

@@ -3,12 +3,14 @@ name: Building and pushing a docker image to Amazon ECR
 on:
   pull_request:
     paths:
-    - app/**
+    - lib/**
+    - assets/**
     branches:
     - master
   push:
     paths:
-    - app/**
+    - lib/**
+    - assets/**
     branches:
     - master
 

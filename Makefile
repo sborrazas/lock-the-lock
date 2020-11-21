@@ -51,6 +51,19 @@ define execute_with_keys
 																	 $(1)"
 endef
 
+.PHONY: encrypt-env
+encrypt-env:
+	aws kms encrypt --plaintext fileb://config/env/$(ENVIRONMENT).plain \
+									--output text \
+									--key-id $(KEY_ID) \
+									--query CiphertextBlob | base64 --decode >config/env/$(ENVIRONMENT).encrypted
+	rm config/env.$(ENVIRONMENT).plain
+
+.PHONY: decrypt-env
+decrypt-env:
+	aws kms decrypt --ciphertext-blob fileb://config/env/$(ENVIRONMENT).encrypted \
+									--output text \
+									--query Plaintext | base64 --decode >config/env/$(ENVIRONMENT).plain
 
 ################################################################################
 # Frontend Makefile API

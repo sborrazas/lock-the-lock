@@ -1,6 +1,6 @@
 import Config
 
-env = System.fetch_env!("MIX_ENV")
+env = config_env()
 debug? = env in ["test", "dev"]
 
 # lock_the_lock

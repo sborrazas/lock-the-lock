@@ -25,6 +25,8 @@ WORKDIR /app
 # Set env
 ENV MIX_ENV prod
 ENV APP_VERSION $APP_VERSION
+
+# These env vars don't matter, it's just for running mix without errors
 ENV APP_PORT 3000
 
 # Install deps
@@ -38,17 +40,16 @@ RUN mix release lock_the_lock
 
 FROM elixir:1.11.1
 
-# Set env
-ENV MIX_ENV prod
-ENV APP_PORT 3000
-
 COPY --from=build /app/_build/prod/rel/lock_the_lock /app
 
 # Install AWS cli and KMS utilities
 RUN apt-get update -y && \
   apt-get install -y awscli jq
 
-# Run
-EXPOSE 3000
+ADD ./bin/start.sh /app/bin/start.sh
+ADD ./config/env /app/env
 
-ENTRYPOINT ["/app/bin/lock_the_lock", "start"]
+# Run
+WORKDIR /app
+
+ENTRYPOINT ["/app/bin/start.sh"]

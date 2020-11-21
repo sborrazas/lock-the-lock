@@ -40,6 +40,10 @@ RUN mix release lock_the_lock
 
 FROM elixir:1.11.1
 
+# Set env
+ENV MIX_ENV prod
+ENV APP_VERSION $APP_VERSION
+
 COPY --from=build /app/_build/prod/rel/lock_the_lock /app
 
 # Install AWS cli and KMS utilities

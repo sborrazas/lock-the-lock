@@ -44,6 +44,10 @@ ENV APP_PORT 3000
 
 COPY --from=build /app/_build/prod/rel/lock_the_lock /app
 
+# Install AWS cli and KMS utilities
+RUN apt-get update -y && \
+  apt-get install -y awscli jq
+
 # Run
 EXPOSE 3000
 

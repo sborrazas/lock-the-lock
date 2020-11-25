@@ -377,6 +377,104 @@ resource "aws_appautoscaling_target" "appautoscaling_target" {
   ]
 }
 
+################################################################################
+# AWS Capacity provider
+################################################################################
+
+resource "aws_security_group" "ecs" {
+  name = var.name
+  description = "For EC2 Instances in the ${var.name} ECS Cluster."
+  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+}
+
+# Allow all outbound traffic from the ECS Cluster
+resource "aws_security_group_rule" "allow_outbound_all" {
+  type = "egress"
+  from_port = 0
+  to_port = 65535
+  protocol = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ecs.id
+}
+
+# Allow inbound SSH traffic
+resource "aws_security_group_rule" "allow_inbound_ssh_from_security_group" {
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ecs.id
+}
+
+# Allow inbound access from any ALBs that will send traffic to this ECS Cluster.
+# We assume that the ALB will only send traffic to Docker containers that expose
+# a port within the "ephemeral" port range. Per https://goo.gl/uLs9NY under
+# "portMappings"/"hostPort", the ephemeral port range used by Docker will range
+# from 32768 - 65535. It gives us pause to open such a wide port range, but
+# dynamic Docker ports don't come without their costs!
+resource "aws_security_group_rule" "allow_inbound_from_alb" {
+  type = "ingress"
+  from_port = 32768
+  to_port = 65535
+  protocol = "tcp"
+  source_security_group_id = data.terraform_remote_state.alb.outputs.security_group_id
+  security_group_id = aws_security_group.ecs.id
+}
+
+# To assign an IAM Role to an EC2 instance, we need to create the intermediate concept of an "IAM Instance Profile".
+resource "aws_iam_instance_profile" "ecs" {
+  name = "${var.name}-cluster"
+  role = aws_iam_role.ecs_instance.name
+}
+
+resource "aws_launch_configuration" "ecs" {
+  name_prefix  = "${var.name}-"
+  image_id  = var.ec2_ami_id
+  instance_type  = var.ec2_instance_type
+  security_groups = [aws_security_group.ecs.id]
+  key_name = var.key_name
+
+  user_data = templatefile("user-data/user-data.sh", {
+    cluster_name = "${var.name}-cluster" # Has to match cluster name
+  })
+  iam_instance_profile = aws_iam_instance_profile.ecs.name
+
+  root_block_device {
+    volume_size = 40 # GB
+    volume_type = "gp2"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_ecs_capacity_provider" "capacity_provider" {
+  name  = "capacity-${var.name}"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.ecs_asg.arn
+    managed_termination_protection = "DISABLED"
+
+    managed_scaling {
+      status = "ENABLED"
+    }
+  }
+}
+
+################################################################################
+# AWS ECS Cluster + Service
+################################################################################
+
+data "terraform_remote_state" "repository" {
+  backend = "s3"
+  config = {
+    region = var.aws_region
+    bucket = var.terraform_state_s3_bucket
+    key = "docker-repo/terraform.tfstate"
+  }
+}
 
 data "terraform_remote_state" "alb" {
   backend = "s3"
@@ -389,6 +487,11 @@ data "terraform_remote_state" "alb" {
 
 resource "aws_ecs_cluster" "cluster" {
   name = "${var.name}-cluster"
+  capacity_providers = [aws_ecs_capacity_provider.capacity_provider.name]
+
+  default_capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.capacity_provider.name
+  }
 }
 
 resource "aws_ecs_task_definition" "task" {
@@ -396,7 +499,7 @@ resource "aws_ecs_task_definition" "task" {
   container_definitions = templatefile("task-definitions/service.json", {
     container_name = var.name
 
-    image = var.image
+    image = data.terraform_remote_state.repository.outputs.url
     version = var.image_version
     cpu = var.cpu
     memory = var.memory

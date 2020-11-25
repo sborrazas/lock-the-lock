@@ -41,8 +41,17 @@ resource "aws_security_group" "lb_sg" {
 
 resource "aws_security_group_rule" "https_sg_rule" {
   type = "ingress"
-  from_port = 433
-  to_port = 433
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.lb_sg.id
+}
+
+resource "aws_security_group_rule" "http_sg_rule" {
+  type = "ingress"
+  from_port = 80
+  to_port = 80
   protocol = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = aws_security_group.lb_sg.id
@@ -102,4 +111,15 @@ resource "aws_lb_target_group" "http_tg" {
   port = 80
   protocol = "HTTP"
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+  target_type = "instance"
+
+  health_check {
+    interval = 30
+    healthy_threshold = 5
+    unhealthy_threshold = 2
+    protocol = "HTTP"
+    path = "/"
+    matcher = "200"
+    timeout = 5
+  }
 }

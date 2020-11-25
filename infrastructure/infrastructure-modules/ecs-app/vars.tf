@@ -19,11 +19,6 @@ variable "env_vars" {
   default     = {}
 }
 
-variable "image" {
-  description = "The Docker image to run"
-  type = string
-}
-
 variable "image_version" {
   description = "Which version (AKA tag) of the var.image Docker image to deploy (e.g. 0.57)"
   type = string
@@ -42,4 +37,39 @@ variable "memory" {
 variable "container_port" {
   description = "The container exposed port"
   type = number
+}
+
+variable "ec2_ami_id" {
+  description = "The AMI of the instances to mount docker on"
+  type = string
+}
+
+variable "ec2_instance_type" {
+  description = "The EC2 instance type to mount the docker containers on"
+  type = string
+}
+
+variable "ec2_cluster_min_size" {
+  description = "The min number of EC2 instances running"
+  type = string
+}
+
+variable "ec2_cluster_max_size" {
+  description = "The max number of EC2 instances running"
+  type = string
+}
+variable "min_number_of_tasks" {
+  description = "The minimum number of ECS Task instances of the ECS Service to run. Auto scaling will never scale in below this number."
+  type = number
+}
+
+variable "max_number_of_tasks" {
+  description = "The maximum number of ECS Task instances of the ECS Service to run. Auto scaling will never scale out above this number."
+  type = number
+  default = null
+}
+
+variable "key_name" {
+  description = "The EC2 Keypair name used to SSH into the ECS Cluster's EC2 Instances."
+  type = string
 }

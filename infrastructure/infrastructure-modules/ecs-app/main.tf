@@ -555,3 +555,22 @@ resource "aws_ecs_service" "app" {
     container_port = var.container_port
   }
 }
+
+################################################################################
+# AWS Auto-Scaling Group
+################################################################################
+
+resource "aws_autoscaling_group" "ecs_asg" {
+  name = var.name
+  min_size = var.ec2_cluster_min_size
+  max_size = var.ec2_cluster_max_size
+  launch_configuration = aws_launch_configuration.ecs.name
+
+  vpc_zone_identifier = data.terraform_remote_state.vpc.outputs.private_subnet_ids
+
+  tag {
+    key = "AmazonECSManaged"
+    value = ""
+    propagate_at_launch = true
+  }
+}

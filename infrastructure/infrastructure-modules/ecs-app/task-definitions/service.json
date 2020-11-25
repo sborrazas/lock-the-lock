@@ -5,13 +5,12 @@
     "cpu": ${cpu},
     "memory": ${memory},
     "essential": true,
-    "portMappings": ${jsonencode([for port in port_mappings : { containerPort = port, protocol = "tcp" }])},
+    "portMappings": ${jsonencode([for port in port_mappings : { hostPort = 0, containerPort = port, protocol = "tcp" }])},
     "environment": ${jsonencode([for key in keys(env_vars) : { name = key, value = lookup(env_vars, key) }])},
     "logConfiguration": {
-      "logDriver": "syslog",
-      "options": {
-        "tag": "${container_name} ({{.ID}})"
-      }
-    }
+      "logDriver": "json-file"
+    },
+    "mountPoints": [],
+    "volumesFrom": []
   }
 ]

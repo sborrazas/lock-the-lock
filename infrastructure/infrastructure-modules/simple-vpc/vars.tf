@@ -22,3 +22,18 @@ variable "private_subnet_cidr_block" {
   description = "The private CIDR block for the VPC"
   type = string
 }
+
+variable "key_name" {
+  description = "The EC2 Keypair name used to SSH into the ECS Cluster's EC2 Instances."
+  type = string
+}
+
+variable "bastion_instance_ami" {
+  description = "The AWS AMI Id"
+  type = string
+}
+
+variable "availability_zones_names" {
+  description = "The AZ's that the app is going to support (greater than 1)"
+  type = list(string)
+}

@@ -18,5 +18,11 @@ inputs = {
     "10.0.0.0/24",
     "10.0.1.0/24"
   ]
+  availability_zones_names = [
+    "us-east-1a",
+    "us-east-1b"
+  ]
   private_subnet_cidr_block = "10.0.2.0/24"
+  key_name = "lock-the-lock"
+  bastion_instance_ami = "ami-04bf6dcdc9ab498ca" # Amazon Linux 2
 }

@@ -15,6 +15,15 @@ terraform {
   required_version = ">= 0.12"
 }
 
+data "terraform_remote_state" "vpc" {
+  backend = "s3"
+  config = {
+    region = var.aws_region
+    bucket = var.terraform_state_s3_bucket
+    key = "vpc/terraform.tfstate"
+  }
+}
+
 ################################################################################
 # AWS ECS Task and Execution Roles
 ################################################################################
@@ -44,6 +53,25 @@ resource "aws_iam_role" "ecs_task" {
   provisioner "local-exec" {
     command = "echo 'Sleeping for 15 seconds to wait for IAM role to be created'; sleep 15"
   }
+}
+
+data "aws_iam_policy_document" "ecs_task_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = ["kms:Decrypt"]
+    resources = [data.terraform_remote_state.kms_master_key.outputs.key_arn]
+  }
+}
+
+resource "aws_iam_policy" "ecs_task_policy" {
+  name = "${var.name}-task-policy"
+  policy = data.aws_iam_policy_document.ecs_task_policy_document.json
+}
+
+resource "aws_iam_policy_attachment" "task_policy_attachment" {
+  name = "${var.name}-task"
+  policy_arn = aws_iam_policy.ecs_task_policy.arn
+  roles = [aws_iam_role.ecs_task.name]
 }
 
 # CREATE AN IAM POLICY AND EXECUTION ROLE TO ALLOW ECS TASK TO MAKE CLOUDWATCH
@@ -129,42 +157,226 @@ resource "aws_iam_role" "ecs_service_role" {
 }
 
 # Create an IAM Policy for acessing the KMS Master Key
-data "aws_iam_policy_document" "access_kms_master_key" {
-  statement {
-    effect = "Allow"
-    actions = ["kms:Decrypt"]
-    resources = [data.terraform_remote_state.kms_master_key.outputs.key_arn]
+# data "aws_iam_policy_document" "access_kms_master_key" {
+#   statement {
+#     effect = "Allow"
+#     actions = ["kms:Decrypt"]
+#     resources = [data.terraform_remote_state.kms_master_key.outputs.key_arn]
+#   }
+# }
+
+# Give this ECS Service access to the KMS Master Key so it can use it to decrypt secrets in config files.
+# resource "aws_iam_role_policy" "access_kms_master_key" {
+#   name = "access-kms-master-key"
+#   role = aws_iam_role.ecs_service_role.name
+#   policy = data.aws_iam_policy_document.access_kms_master_key.json
+# }
+
+# CREATE AN IAM POLICY THAT ALLOWS THE SERVICE TO TALK TO THE ELB
+resource "aws_iam_role_policy" "ecs_service_policy" {
+  name = "${var.name}-ecs-service-policy"
+  role = aws_iam_role.ecs_service_role.id
+  policy = data.aws_iam_policy_document.ecs_service_policy.json
+
+  # IAM objects take time to propagate. This leads to subtle eventual consistency bugs where the ECS task cannot be
+  # created because the IAM role does not exist. We add a 15 second wait here to give the IAM role a chance to propagate
+  # within AWS.
+  provisioner "local-exec" {
+    command = "echo 'Sleeping for 15 seconds to wait for IAM role to be created'; sleep 15"
   }
 }
 
-# Give this ECS Service access to the KMS Master Key so it can use it to decrypt secrets in config files.
-resource "aws_iam_role_policy" "access_kms_master_key" {
-  name = "access-kms-master-key"
-  role = aws_iam_role.ecs_service_role.name
-  policy = data.aws_iam_policy_document.access_kms_master_key.json
+data "aws_iam_policy_document" "ecs_service_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ec2:Describe*",
+      "ec2:AuthorizeSecurityGroupIngress",
+      "elasticloadbalancing:Describe*",
+      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+      "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+      "elasticloadbalancing:DeregisterTargets",
+      "elasticloadbalancing:RegisterTargets"
+    ]
+
+    resources = ["*"]
+  }
 }
 
 ################################################################################
-# AWS ECS Cluster + Service
+# AWS Instance Role
 ################################################################################
 
-# data "terraform_remote_state" "vpc" {
-#   backend = "s3"
-#   config = {
-#     region = var.aws_region
-#     bucket = var.terraform_state_s3_bucket
-#     key = "vpc/terraform.tfstate"
-#   }
-# }
+resource "aws_iam_role" "ecs_instance" {
+  name = "${var.name}-instance"
+  assume_role_policy = data.aws_iam_policy_document.ecs_role.json
 
-# data "terraform_remote_state" "repository" {
-#   backend = "s3"
-#   config = {
-#     region = var.aws_region
-#     bucket = var.terraform_state_s3_bucket
-#     key = "docker-repo/terraform.tfstate"
-#   }
-# }
+  # IAM objects take time to propagate. This leads to subtle eventual
+  # consistency bugs where the ECS cluster cannot be created because the IAM
+  # role does not exist. We add a 15 second wait here to give the IAM role a
+  # chance to propagate within AWS.
+  provisioner "local-exec" {
+    command = "echo 'Sleeping for 15 seconds to wait for IAM role to be created'; sleep 15"
+  }
+}
+
+data "aws_iam_policy_document" "ecs_role" {
+  statement {
+    effect = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+# IAM policy we add to our EC2 Instance Role that allows an ECS Agent
+# running on the EC2 Instance to communicate with an ECS cluster.
+resource "aws_iam_role_policy" "ecs" {
+  name = "${var.name}-ecs-permissions"
+  role = aws_iam_role.ecs_instance.id
+  policy = data.aws_iam_policy_document.ecs_permissions.json
+}
+
+data "aws_iam_policy_document" "ecs_permissions" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ecs:CreateCluster",
+      "ecs:DeregisterContainerInstance",
+      "ecs:DiscoverPollEndpoint",
+      "ecs:Poll",
+      "ecs:RegisterContainerInstance",
+      "ecs:StartTelemetrySession",
+      "ecs:Submit*",
+      "ecs:UpdateContainerInstancesState",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+# IAM policy we add to our EC2 Instance Role that allows ECS Instances to pull all containers from Amazon EC2 Container
+# Registry.
+resource "aws_iam_role_policy" "ecr" {
+  name = "${var.name}-docker-login-for-ecr"
+  role = aws_iam_role.ecs_instance.id
+  policy = data.aws_iam_policy_document.ecr_permissions.json
+}
+
+data "aws_iam_policy_document" "ecr_permissions" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:DescribeRepositories",
+      "ecr:GetAuthorizationToken",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:GetRepositoryPolicy",
+      "ecr:ListImages",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+################################################################################
+# AWS Auto-Scaling Target
+################################################################################
+
+# Create an IAM Role to be used by the Amazon Autoscaling Service on the ECS Service
+# For details, see: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/autoscale_IAM_role.html
+resource "aws_iam_role" "ecs_service_autoscaling_role" {
+  name = "${var.name}-autoscaling"
+  assume_role_policy = data.aws_iam_policy_document.ecs_service_autoscaling_role.json
+
+  # IAM objects take time to propagate. This leads to subtle eventual
+  # consistency bugs where the ECS service cannot be created because the IAM
+  # role does not exist. We add a 15 second wait here to give the IAM role a
+  # chance to propagate within AWS.
+  provisioner "local-exec" {
+    command = "echo 'Sleeping for 15 seconds to wait for IAM role to be created'; sleep 15"
+  }
+}
+
+# Create the Trust Policy as documented at
+# http://docs.aws.amazon.com/AmazonECS/latest/developerguide/autoscale_IAM_role.html
+data "aws_iam_policy_document" "ecs_service_autoscaling_role" {
+  statement {
+    effect = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = ["application-autoscaling.amazonaws.com"]
+    }
+  }
+}
+
+# Create an IAM Policy that allows the ECS Service to perform Auto Scaling actions
+# For details, see: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/autoscale_IAM_role.html
+resource "aws_iam_role_policy" "ecs_service_autoscaling_policy" {
+  name = "${var.name}-ecs-service-autoscaling-policy"
+  role = aws_iam_role.ecs_service_autoscaling_role.id
+  policy = data.aws_iam_policy_document.ecs_service_autoscaling_policy.json
+}
+
+# Create the IAM Policy document that grants permissions to perform Auto Scaling actions
+data "aws_iam_policy_document" "ecs_service_autoscaling_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ecs:DescribeServices",
+      "ecs:UpdateService",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "cloudwatch:DescribeAlarms",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+locals {
+  # Use a RegEx
+  # (https://www.terraform.io/docs/configuration/interpolation.html#replace_string_search_replace_)
+  # that takes a value like "arn:aws:iam::123456789012:role/S3Access" and looks
+  # for the string after the last "/".
+
+  ecs_cluster_name = replace(aws_ecs_cluster.cluster.arn, "/.*/+(.*)/", "$1")
+}
+
+# Create an App AutoScaling Target that allows us to add AutoScaling Policies to our ECS Service
+resource "aws_appautoscaling_target" "appautoscaling_target" {
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace = "ecs"
+
+  # Last part has to match the service name "${var.name}-service" defined below
+  resource_id = "service/${local.ecs_cluster_name}/${var.name}-service"
+  role_arn = aws_iam_role.ecs_service_autoscaling_role.arn
+
+  min_capacity = var.min_number_of_tasks
+  max_capacity = var.max_number_of_tasks
+
+  depends_on = [
+    aws_ecs_service.app
+  ]
+}
+
 
 data "terraform_remote_state" "alb" {
   backend = "s3"
@@ -194,6 +406,7 @@ resource "aws_ecs_task_definition" "task" {
   task_role_arn = aws_iam_role.ecs_task.arn
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   network_mode = "bridge"
+  requires_compatibilities = []
 
   tags = {
     Name = "${var.name}-TaskDefinition"

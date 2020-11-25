@@ -495,7 +495,7 @@ resource "aws_ecs_cluster" "cluster" {
 }
 
 resource "aws_ecs_task_definition" "task" {
-  family = "${var.name}-Service"
+  family = "${var.name}-task"
   container_definitions = templatefile("task-definitions/service.json", {
     container_name = var.name
 
@@ -533,17 +533,13 @@ resource "aws_ecs_task_definition" "task" {
 #   depends_on = [aws_ecs_task_definition.task]
 # }
 
-
-
-
-
-
-
 resource "aws_ecs_service" "app" {
   name = "${var.name}-service"
   cluster = aws_ecs_cluster.cluster.arn
   desired_count = 2
   iam_role = aws_iam_role.ecs_service_role.arn
+  task_definition = aws_ecs_task_definition.task.arn
+  launch_type = "EC2"
 
   # "binpack" strategy picks the EC2 instance to deploy the task to so as to
   # leave the least amount of unused CPU. This strategy minimizes the number of

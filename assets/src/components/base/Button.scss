@@ -1,0 +1,36 @@
+@import "./mixins";
+
+$base-color: #ffbf00;
+
+.Button {
+  background-color: $base-color;
+  border-radius: 4px;
+  border-top: 2px transparent solid;
+  border-top-color: adjust-color($base-color, $green: 34); // #ffe100;
+  border-bottom: 2px transparent solid;
+  border-bottom-color: adjust-color($base-color, $red: -7, $green: -56); // #f88700;
+  box-shadow: 0 0 1px 10px rgba(255, 255, 255, 0.36);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 24px;
+  margin: 10px; /* = box-sadow */
+  padding: 20px;
+  position: relative;
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+
+  &:hover {
+    background-color: adjust-color($base-color, $green: 12); // #ffcb00;
+    border-top-color: adjust-color($base-color, $green: 48, $blue: 124); // #ffef7c;
+    border-bottom-color: adjust-color($base-color, $red: -7, $green: -56); // #f88700;
+  }
+  $base-color: #ffbf00;
+  &:active {
+    border-top-width: 3px;
+    border-bottom-width: 1px;
+    background-color: adjust-color($base-color, $green: -20); // #ffab00;
+    border-top-color: adjust-color($base-color, $green: -20); // #ffab00;
+    border-bottom-color: adjust-color($base-color, $green: -20); // #ffab00;
+  }
+}

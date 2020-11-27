@@ -1,0 +1,17 @@
+@import "./mixins";
+
+.Text-strong {
+  font-weight: bold;
+}
+
+.Text-inlineImage {
+  display: inline-block;
+  margin: 0 6px;
+  max-height: 1em;
+  position: relative;
+  top: 2px;
+}
+
+.Text-link {
+  color: red;
+}

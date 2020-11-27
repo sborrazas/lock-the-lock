@@ -1,10 +1,11 @@
 @import-normalize;
 
 @import "./variables.scss";
+@import "./reset.scss";
 
 document,
 body {
-  background: $base--backgroundColor;
+  background: $base--backgroundColor url(/images/bg.png) repeat;
   color: $base--color;
   font-family: $base--fontFamily;
   font-size: $base--fontSize;

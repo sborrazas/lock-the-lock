@@ -1,0 +1,53 @@
+@import "./mixins";
+
+.Layout {
+}
+
+.Layout--landing {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.Layout-header {
+}
+
+.Layout-content {
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.Layout-footer {
+  align-self: flex-end;
+  flex: 1 100%;
+  font-size: 1.23em; /* 16 / 13 */
+  font-weight: bold;
+  padding: 10px 0;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.Layout-landing {
+  flex: 1 1 100%;
+  font-size: 1.38em; /* 18 / 13 */
+  max-width: 700px;
+  padding: 30px 0;
+}
+
+.Layout-landingLogo {
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 30px;
+  max-width: 50%;
+}
+
+.Layout-landingHeader {
+  @include hidden;
+}

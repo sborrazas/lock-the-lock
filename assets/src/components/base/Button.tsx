@@ -6,19 +6,19 @@ import "./Button.scss";
 
 type ButtonProps = {
   children: React.ReactNode;
-  cta: boolean;
+  cta?: boolean;
   onClick: () => void
 };
 
-const Button = ({ children, cta, onClick }: ButtonProps) => {
+const Button = ({ children, cta = false, onClick }: ButtonProps) => {
   const className = cssClasses({
     "Button": true,
     "Button--cta": cta
   });
 
   return (
-    <div className={ className } onClick={(e) => { e.preventDefault(); onClick(); }}>
-      { children }
+    <div className={className} onClick={(e) => { e.preventDefault(); onClick(); }}>
+      {children}
     </div>
   );
 };

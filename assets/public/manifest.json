@@ -8,18 +8,18 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo200.png",
+      "src": "lock-the-lock-200.png",
       "type": "image/png",
       "sizes": "200x141"
     },
     {
-      "src": "logo400.png",
+      "src": "lock-the-lock-400.png",
       "type": "image/png",
       "sizes": "400x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#F8F806",
+  "background_color": "#0A5EFB"
 }

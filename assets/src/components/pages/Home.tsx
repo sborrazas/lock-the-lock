@@ -23,8 +23,8 @@ type Props = PropsFromRedux & {
 
 const Home = ({ createLock }: Props) => {
   return (
-    <Layout isLanding>
-      <LayoutLanding title="Lock The Lock">
+    <Layout title="Lock The Lock" isLanding>
+      <LayoutLanding>
         <List>
           <ListItem>
             Only <Strong>one</Strong> user can have the lock

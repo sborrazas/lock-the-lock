@@ -16,69 +16,61 @@ const Layout = ({ children, isLanding }: LayoutProps) => {
     "Layout--landing": isLanding
   });
 
-  return (
-    <div className={ className }>
-      {children}
-    </div>
-  );
+  return (<div className={className}>{children}</div>);
 };
 
-type LayoutContentProps = {
+type ContentProps = {
   children: React.ReactNode;
 };
 
-const LayoutContent = ({ children }: LayoutContentProps) => {
+const Content = ({ children }: ContentProps) => {
   return (<div className="Layout-content">{children}</div>);
 };
 
 type HeaderProps = {
   children: React.ReactNode;
-  title: string;
+  isLanding: boolean;
 };
 
-const Header = ({ children, title }: HeaderProps) => {
-  return (
-    <header className="Layout-header">
-      <LayoutContent>
-        <h1 className="Layout-headerTitle">{title}</h1>
+const Header = ({ isLanding, children }: HeaderProps) => {
+  const className = cssClasses({
+    "Layout-header": true,
+    "Layout-header--landing": isLanding
+  });
 
-        {children}
-      </LayoutContent>
-    </header>
+  return (
+    <div className={className}>
+      {children}
+    </div>
   );
 };
 
 type LandingProps = {
   children: React.ReactNode;
-  title: string;
 };
 
-const Landing = ({ children, title }: LandingProps) => {
+const Landing = ({ children }: LandingProps) => {
   return (
     <div className="Layout-landing">
-      <header className="Layout-landingHeader">
-        <h1>{title}</h1>
-      </header>
-      <LayoutContent>
-        <img className="Layout-landingLogo" src="/lock-the-lock.svg" alt="Lock The Lock" />
-        <main className="Layout-landingBody">
-          {children}
-        </main>
-      </LayoutContent>
+      <img className="Layout-landingLogo" src="/lock-the-lock.svg" alt="Lock The Lock" />
+      <main className="Layout-landingBody">
+        {children}
+      </main>
     </div>
   );
 };
 
 type BodyProps = {
   children: React.ReactNode;
+  isLanding: boolean;
 };
 
-const Body = ({ children }: BodyProps) => {
+const Body = ({ isLanding, children }: BodyProps) => {
   return (
     <main className="Layout-body">
-      <LayoutContent>
+      <Content>
         {children}
-      </LayoutContent>
+      </Content>
     </main>
   );
 };
@@ -90,12 +82,12 @@ type FooterProps = {
 const Footer = ({ children }: FooterProps) => {
   return (
     <footer className="Layout-footer">
-      <LayoutContent>
+      <Content>
         {children}
-      </LayoutContent>
+      </Content>
     </footer>
   );
 };
 
-export { Header, Landing, Body, Footer };
+export { Header, Landing, Body, Footer, Content };
 export default Layout;

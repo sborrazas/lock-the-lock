@@ -1,0 +1,94 @@
+@import "./mixins";
+@import "./variables";
+
+.Badge {
+  @include clearfix;
+
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  padding: 10px 15px;
+  user-select: none;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  &:active {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.Badge-label {
+  background: red;
+  border-radius: 10px;
+  display: inline-block;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+  width: 20px;
+}
+
+.Badge-label--color1 { background-color: #FFFFFF }
+.Badge-label--color2 { background-color: #FFF200 }
+.Badge-label--color3 { background-color: #FFDE00 }
+.Badge-label--color4 { background-color: #FFCB08 }
+.Badge-label--color5 { background-color: #FDB814 }
+.Badge-label--color6 { background-color: #FAA61A }
+.Badge-label--color7 { background-color: #F7941E }
+.Badge-label--color8 { background-color: #F58220 }
+.Badge-label--color9 { background-color: #F36F21 }
+.Badge-label--color10 { background-color: #F15922 }
+.Badge-label--color11 { background-color: #EF3F23 }
+.Badge-label--color12 { background-color: #ED1C23 }
+.Badge-label--color13 { background-color: #ED1A2E }
+.Badge-label--color14 { background-color: #ED1A3B }
+.Badge-label--color15 { background-color: #ED1846 }
+.Badge-label--color16 { background-color: #ED1651 }
+.Badge-label--color17 { background-color: #ED145B }
+.Badge-label--color18 { background-color: #ED1165 }
+.Badge-label--color19 { background-color: #ED0D6E }
+.Badge-label--color20 { background-color: #ED0677 }
+.Badge-label--color21 { background-color: #ED0281 }
+.Badge-label--color22 { background-color: #EC008C }
+.Badge-label--color23 { background-color: #D80D8C }
+.Badge-label--color24 { background-color: #C6168D }
+.Badge-label--color25 { background-color: #B41D8D }
+.Badge-label--color26 { background-color: #A3238E }
+.Badge-label--color27 { background-color: #92278F }
+.Badge-label--color28 { background-color: #812A90 }
+.Badge-label--color29 { background-color: #702C91 }
+.Badge-label--color30 { background-color: #5C2E91 }
+.Badge-label--color31 { background-color: #462E91 }
+.Badge-label--color32 { background-color: #2E3192 }
+.Badge-label--color33 { background-color: #213F9A }
+.Badge-label--color34 { background-color: #0D4DA2 }
+.Badge-label--color35 { background-color: #005AAB }
+.Badge-label--color36 { background-color: #0066B3 }
+.Badge-label--color37 { background-color: #0072BC }
+.Badge-label--color38 { background-color: #007DC6 }
+.Badge-label--color39 { background-color: #0089D0 }
+.Badge-label--color40 { background-color: #0095DA }
+.Badge-label--color41 { background-color: #00AEEF }
+.Badge-label--color42 { background-color: #00ACDC }
+.Badge-label--color43 { background-color: #00ABCD }
+.Badge-label--color44 { background-color: #00ABBD }
+.Badge-label--color45 { background-color: #00AAAD }
+.Badge-label--color46 { background-color: #00A99D }
+.Badge-label--color47 { background-color: #00A88E }
+.Badge-label--color48 { background-color: #00A77E }
+.Badge-label--color49 { background-color: #00A76D }
+.Badge-label--color50 { background-color: #00A65E }
+.Badge-label--color51 { background-color: #00A651 }
+.Badge-label--color52 { background-color: #00AB4E }
+.Badge-label--color53 { background-color: #22B24C }
+.Badge-label--color54 { background-color: #4DB848 }
+.Badge-label--color55 { background-color: #71BF44 }
+.Badge-label--color56 { background-color: #8CC63F }
+.Badge-label--color57 { background-color: #A6CE39 }
+.Badge-label--color58 { background-color: #BED62E }
+.Badge-label--color59 { background-color: #D7DF21 }
+.Badge-label--color60 { background-color: #ECE80F }

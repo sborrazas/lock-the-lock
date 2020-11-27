@@ -16,16 +16,23 @@
 }
 
 .Layout-header {
+  flex: 1 1 100%;
 }
 
 .Layout-content {
   margin: 0 auto;
   max-width: 800px;
+  min-width: 300px;
   padding: 0 20px;
+}
+
+.Layout-body {
+  flex: 1 1 100%;
 }
 
 .Layout-footer {
   align-self: flex-end;
+  background-color: rgba(255, 255, 255, 0.4);
   flex: 1 100%;
   font-size: 1.23em; /* 16 / 13 */
   font-weight: bold;
@@ -35,7 +42,6 @@
 }
 
 .Layout-landing {
-  flex: 1 1 100%;
   font-size: 1.38em; /* 18 / 13 */
   max-width: 700px;
   padding: 30px 0;
@@ -48,6 +54,6 @@
   max-width: 50%;
 }
 
-.Layout-landingHeader {
+.Layout-header--landing {
   @include hidden;
 }

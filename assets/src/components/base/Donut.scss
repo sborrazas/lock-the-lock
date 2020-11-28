@@ -4,6 +4,14 @@
 .Donut {
 }
 
+.Donut-path {
+  cursor: pointer;
+
+  &:hover {
+    fill: red;
+  }
+}
+
 .Donut-path--color1 { fill: #FFFFFF }
 .Donut-path--color2 { fill: #FFF200 }
 .Donut-path--color3 { fill: #FFDE00 }

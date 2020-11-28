@@ -27,12 +27,12 @@ type Props = PropsFromRedux & RouteComponentProps<{ lockId: string }> & {};
 
 const users = [ // Hard-coded data for now
   { id: 1, colorNumber: 1, label: "aalice" },
-  { id: 21, colorNumber: 39, label: "bbob" },
-  { id: 35, colorNumber: 22, label: "mark" },
-  { id: 54, colorNumber: 54, label: "john.doe" },
-  { id: 52, colorNumber: 50, label: "pepe" },
-  { id: 52, colorNumber: 8, label: "pepe" },
-  { id: 52, colorNumber: 15, label: "pepe" }
+  { id: 2, colorNumber: 39, label: "bbob" },
+  { id: 3, colorNumber: 22, label: "mark" },
+  { id: 4, colorNumber: 54, label: "john.doe" },
+  { id: 5, colorNumber: 50, label: "pepe" },
+  { id: 6, colorNumber: 8, label: "pepe" },
+  { id: 7, colorNumber: 15, label: "pepe" }
 ];
 
 const selectedId = 1;

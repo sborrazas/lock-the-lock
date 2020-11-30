@@ -35,7 +35,7 @@ const users = [ // Hard-coded data for now
   { id: 7, colorNumber: 15, label: "pepe" }
 ];
 
-const selectedId = 1;
+const selectedId = 4;
 
 const Home = ({ createLock, match: { params: { lockId } } }: Props) => {
   return (

@@ -13,34 +13,70 @@ type DonutItem = {
 
 type DonutProps = {
   items: Array<DonutItem>;
-  selectedId: number;
+  selectedId?: number;
 };
 
-const INNER_RADIUS = 100;
-const OUTER_RADIUS = 200;
-const SELECTED_OUTER_RADIUS = 220;
-const SELECTED_INNER_RADIUS = 80;
+const RADIUS = 30;
+const PERIMETER = Math.PI * 2 * RADIUS;
 
-const Donut = ({ items }: DonutProps) => {
-  const arcs = computeArcs(items, OUTER_RADIUS, INNER_RADIUS);
+const Donut = ({ items, selectedId }: DonutProps) => {
+  const total = items.length;
+  const offset = PERIMETER * (total - 1) / total;
+  const selectedIndex = selectedId ? items.findIndex(i => i.id === selectedId) : -1;
+  const arcs = computeArcs(items, selectedIndex, RADIUS);
+  const globalRotate = selectedIndex === -1 ? 0 : (360 * (selectedIndex + 0.5) / total);
 
-        // <g transform="translate(285,292.5)rotate(177.5)">
+  console.log("SELECTED INDEX", selectedIndex);
+
   return (
     <section className="Donut">
-      <svg width="100%" height="100%" viewBox="0 0 440 440" preserveAspectRatio="xMinYMin">
-        <g transform="translate(220,220)rotate(0)">
+      <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin">
+        <g transform={`rotate(${globalRotate}, 50, 50)translate(50, 50)`}>
           {
-            arcs.map(({ arc, item: { id, colorNumber, label } }, index) => {
+            arcs.map(({ item: { id, colorNumber }, rotate }, index) => {
               const className = cssClasses({
-                "Donut-path": true,
-                [`Donut-path--color${colorNumber}`]: true
+                "Donut-arc": true,
+                [`Donut-arc--color${colorNumber}`]: true
               });
-              return (<path key={id.toString()} className={className} d={arc} />);
+
+              return (
+                  <circle key={id.toString()}
+                          className={className}
+                          cx="0"
+                          cy="0"
+                          r={RADIUS}
+                          strokeWidth="15"
+                          fill="transparent"
+                          strokeDasharray={PERIMETER}
+                          strokeDashoffset={offset}
+                          transform={`rotate(${rotate}, 0, 0)`} />
+              );
+            })
+          }
+          {
+            arcs.map(({ arc, item: { colorNumber } }, index) => {
+              return (
+                <path id={`arc-${index}`}
+                      key={index.toString()}
+                      d={arc}
+                      fill="transparent" />
+              );
+            })
+          }
+          {
+            arcs.map(({ item: { id, label } }, index) => {
+              return (
+                <text key={id.toString()} className="Donut-label" textAnchor="middle">
+                  <textPath alignmentBaseline="middle" xlinkHref={`#arc-${index}`} startOffset="50%">
+                    {label}
+                  </textPath>
+                </text>
+              );
             })
           }
         </g>
-        <g>
-          <circle cx={SELECTED_OUTER_RADIUS} cy={SELECTED_OUTER_RADIUS} r={SELECTED_INNER_RADIUS} />
+        <g transform="translate(50, 50)">
+           <circle className="Donut-innerCircle" cx="0" cy="0" r="22" />
         </g>
       </svg>
     </section>

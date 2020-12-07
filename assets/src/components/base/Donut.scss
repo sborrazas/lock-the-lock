@@ -23,6 +23,10 @@
 .Donut-arc {
 }
 
+.Donut-arc--selected {
+  stroke-width: 20px;
+}
+
 .Donut-arc--color1 { stroke: #ECE80F }
 .Donut-arc--color2 { stroke: #FFF200 }
 .Donut-arc--color3 { stroke: #FFDE00 }

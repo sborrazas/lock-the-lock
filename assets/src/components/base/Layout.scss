@@ -19,6 +19,10 @@
   flex: 1 1 100%;
 }
 
+.Layout-header--landing {
+  @include hidden;
+}
+
 .Layout-content {
   margin: 0 auto;
   max-width: 1536px;
@@ -28,6 +32,20 @@
 
 .Layout-body {
   flex: 1 1 100%;
+}
+
+.Layout-innerBody {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.Layout-section {
+  flex: 10 1 100%;
+}
+
+.Layout-aside {
+  flex: 5 1 66%;
 }
 
 .Layout-footer {
@@ -43,6 +61,7 @@
 
 .Layout-landing {
   font-size: 1.38em; /* 18 / 13 */
+  margin: 0 auto;
   max-width: 700px;
   padding: 30px 0;
 }
@@ -52,8 +71,4 @@
   margin: 0 auto;
   margin-bottom: 30px;
   max-width: 50%;
-}
-
-.Layout-header--landing {
-  @include hidden;
 }

@@ -69,7 +69,9 @@ const Body = ({ isLanding, children }: BodyProps) => {
   return (
     <main className="Layout-body">
       <Content>
-        {children}
+        <div className="Layout-innerBody">
+          {children}
+        </div>
       </Content>
     </main>
   );
@@ -89,5 +91,29 @@ const Footer = ({ children }: FooterProps) => {
   );
 };
 
-export { Header, Landing, Body, Footer, Content };
+type SectionProps = {
+  children: React.ReactNode;
+};
+
+const Section = ({ children }: SectionProps) => {
+  return (
+    <section className="Layout-section">
+      {children}
+    </section>
+  );
+};
+
+type AsideProps = {
+  children: React.ReactNode;
+};
+
+const Aside = ({ children }: AsideProps) => {
+  return (
+    <aside className="Layout-aside">
+      {children}
+    </aside>
+  );
+};
+
+export { Header, Landing, Body, Footer, Content, Section, Aside };
 export default Layout;

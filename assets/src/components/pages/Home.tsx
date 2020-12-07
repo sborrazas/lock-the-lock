@@ -1,7 +1,7 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 
-import Layout from "./Layout";
+import Root from "./Root";
 import { Landing as LayoutLanding } from "../base/Layout";
 import List, {
   Item as ListItem
@@ -23,7 +23,7 @@ type Props = PropsFromRedux & {
 
 const Home = ({ createLock }: Props) => {
   return (
-    <Layout title="Lock The Lock" isLanding>
+    <Root title="Lock The Lock" isLanding>
       <LayoutLanding>
         <List>
           <ListItem>
@@ -38,7 +38,7 @@ const Home = ({ createLock }: Props) => {
         </List>
         <Button cta onClick={ () => createLock("a") }>Create lock</Button>
       </LayoutLanding>
-    </Layout>
+    </Root>
   );
 };
 

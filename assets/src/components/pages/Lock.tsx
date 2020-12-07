@@ -4,17 +4,19 @@ import {
   RouteComponentProps
 } from "react-router-dom";
 
-import Layout from "./Layout";
-import { Landing as LayoutLanding } from "../base/Layout";
-import List, {
-  Item as ListItem
-} from "../base/List";
+import Root from "./Root";
+import {
+  Aside as LayoutAside,
+  Section as LayoutSection
+} from "../base/Layout";
 import {
   Strong
 } from "../base/Text";
 import Button from "../base/Button";
 import Donut from "../base/Donut";
-import Teleprompter from "../base/Teleprompter";
+import Teleprompter, {
+  Item as TeleprompterItem
+} from "../base/Teleprompter";
 
 import { RootState } from "../../resources/reducer";
 import { createLock } from "../../resources/locks/actions";
@@ -39,11 +41,42 @@ const selectedId = 4;
 
 const Home = ({ createLock, match: { params: { lockId } } }: Props) => {
   return (
-    <Layout title={`Lock ${lockId}`}>
-      <Donut items={users} selectedId={selectedId} />
-      <Teleprompter>
-      </Teleprompter>
-    </Layout>
+    <Root title={`Lock ${lockId}`}>
+      <LayoutSection>
+        <Donut items={users} selectedId={selectedId} />
+      </LayoutSection>
+      <LayoutAside>
+        <Teleprompter>
+          <TeleprompterItem>
+            <Strong>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
+          </TeleprompterItem>
+          <TeleprompterItem>
+            <Strong>john.doe</Strong> acquired the lock
+          </TeleprompterItem>
+          <TeleprompterItem>
+            <Strong>pepe</Strong> joined the lock
+          </TeleprompterItem>
+          <TeleprompterItem>
+            <Strong>pepe</Strong> left the lock
+          </TeleprompterItem>
+          <TeleprompterItem>
+            <Strong>pepe</Strong> left the lock
+          </TeleprompterItem>
+          <TeleprompterItem>
+            <Strong>pepe</Strong> left the lock
+          </TeleprompterItem>
+          <TeleprompterItem>
+            <Strong>pepe</Strong> left the lock
+          </TeleprompterItem>
+          <TeleprompterItem>
+            <Strong>pepe</Strong> left the lock
+          </TeleprompterItem>
+          <TeleprompterItem>
+            <Strong>pepe</Strong> left the lock
+          </TeleprompterItem>
+        </Teleprompter>
+      </LayoutAside>
+    </Root>
   );
 };
 

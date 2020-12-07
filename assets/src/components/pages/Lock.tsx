@@ -46,7 +46,7 @@ const Home = ({ createLock, match: { params: { lockId } } }: Props) => {
         <Donut items={users} selectedId={selectedId} />
       </LayoutSection>
       <LayoutAside>
-        <Teleprompter>
+        <Teleprompter itemsCount={3}>
           <TeleprompterItem>
             <Strong>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
           </TeleprompterItem>

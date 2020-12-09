@@ -15,6 +15,10 @@ services:
       - .:/app:delegated
       - ~/.ssh:/root/.ssh:cached
       - shared_vol:/shared
+    networks:
+      lock_net:
+        aliases:
+          - lock.localhost.com
     ports:
       - "4000:4000"
     command: mix phx.server
@@ -24,6 +28,8 @@ services:
     volumes:
       - .:/app:delegated
       - shared_vol:/shared
+    networks:
+      lock_net:
     ports:
       - "3000:3000"
     entrypoint: ""
@@ -40,5 +46,8 @@ services:
       - ~/.aws:/root/.aws
     entrypoint:
       ["/bin/bash", "-c", "eval `ssh-agent -s` && ssh-add ~/.ssh/id_rsa && /bin/bash"]
+networks:
+  lock_net:
+    name: lock_the_lock_net
 volumes:
   shared_vol:

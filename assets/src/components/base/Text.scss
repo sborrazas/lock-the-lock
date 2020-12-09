@@ -4,6 +4,8 @@
   font-weight: bold;
 }
 
+@include custom-colors("Text-strong", "color");
+
 .Text-inlineImage {
   display: inline-block;
   margin: 0 6px;

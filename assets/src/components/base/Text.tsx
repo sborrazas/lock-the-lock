@@ -1,13 +1,21 @@
 import React from "react";
 
+import { cssClasses } from "../../helpers/css";
+
 import "./Text.scss";
 
 type StrongProps = {
   children: React.ReactNode;
+  colorNumber?: number;
 };
 
-const Strong = ({ children }: StrongProps) => {
-  return (<strong className="Text-strong">{children}</strong>);
+const Strong = ({ children, colorNumber }: StrongProps) => {
+  const className = cssClasses({
+    "Text-strong": true,
+    [`Text-strong--color${colorNumber}`]: !! colorNumber
+  });
+
+  return (<strong className={className}>{children}</strong>);
 };
 
 type InlineImageProps = {

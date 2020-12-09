@@ -23,66 +23,8 @@
 .Donut-arc {
 }
 
+@include custom-colors("Donut-arc", "stroke");
+
 .Donut-arc--selected {
   stroke-width: 20px;
 }
-
-.Donut-arc--color1 { stroke: #ECE80F }
-.Donut-arc--color2 { stroke: #FFF200 }
-.Donut-arc--color3 { stroke: #FFDE00 }
-.Donut-arc--color4 { stroke: #FFCB08 }
-.Donut-arc--color5 { stroke: #FDB814 }
-.Donut-arc--color6 { stroke: #FAA61A }
-.Donut-arc--color7 { stroke: #F7941E }
-.Donut-arc--color8 { stroke: #F58220 }
-.Donut-arc--color9 { stroke: #F36F21 }
-.Donut-arc--color10 { stroke: #F15922 }
-.Donut-arc--color11 { stroke: #EF3F23 }
-.Donut-arc--color12 { stroke: #ED1C23 }
-.Donut-arc--color13 { stroke: #ED1A2E }
-.Donut-arc--color14 { stroke: #ED1A3B }
-.Donut-arc--color15 { stroke: #ED1846 }
-.Donut-arc--color16 { stroke: #ED1651 }
-.Donut-arc--color17 { stroke: #ED145B }
-.Donut-arc--color18 { stroke: #ED1165 }
-.Donut-arc--color19 { stroke: #ED0D6E }
-.Donut-arc--color20 { stroke: #ED0677 }
-.Donut-arc--color21 { stroke: #ED0281 }
-.Donut-arc--color22 { stroke: #EC008C }
-.Donut-arc--color23 { stroke: #D80D8C }
-.Donut-arc--color24 { stroke: #C6168D }
-.Donut-arc--color25 { stroke: #B41D8D }
-.Donut-arc--color26 { stroke: #A3238E }
-.Donut-arc--color27 { stroke: #92278F }
-.Donut-arc--color28 { stroke: #812A90 }
-.Donut-arc--color29 { stroke: #702C91 }
-.Donut-arc--color30 { stroke: #5C2E91 }
-.Donut-arc--color31 { stroke: #462E91 }
-.Donut-arc--color32 { stroke: #2E3192 }
-.Donut-arc--color33 { stroke: #213F9A }
-.Donut-arc--color34 { stroke: #0D4DA2 }
-.Donut-arc--color35 { stroke: #005AAB }
-.Donut-arc--color36 { stroke: #0066B3 }
-.Donut-arc--color37 { stroke: #0072BC }
-.Donut-arc--color38 { stroke: #007DC6 }
-.Donut-arc--color39 { stroke: #0089D0 }
-.Donut-arc--color40 { stroke: #0095DA }
-.Donut-arc--color41 { stroke: #00AEEF }
-.Donut-arc--color42 { stroke: #00ACDC }
-.Donut-arc--color43 { stroke: #00ABCD }
-.Donut-arc--color44 { stroke: #00ABBD }
-.Donut-arc--color45 { stroke: #00AAAD }
-.Donut-arc--color46 { stroke: #00A99D }
-.Donut-arc--color47 { stroke: #00A88E }
-.Donut-arc--color48 { stroke: #00A77E }
-.Donut-arc--color49 { stroke: #00A76D }
-.Donut-arc--color50 { stroke: #00A65E }
-.Donut-arc--color51 { stroke: #00A651 }
-.Donut-arc--color52 { stroke: #00AB4E }
-.Donut-arc--color53 { stroke: #22B24C }
-.Donut-arc--color54 { stroke: #4DB848 }
-.Donut-arc--color55 { stroke: #71BF44 }
-.Donut-arc--color56 { stroke: #8CC63F }
-.Donut-arc--color57 { stroke: #A6CE39 }
-.Donut-arc--color58 { stroke: #BED62E }
-.Donut-arc--color59 { stroke: #D7DF21 }

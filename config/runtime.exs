@@ -1,7 +1,7 @@
 import Config
 
 env = config_env()
-debug? = env in ["test", "dev"]
+debug? = env in [:test, :dev]
 
 # lock_the_lock
 config :lock_the_lock, LockTheLockWeb.Endpoint,
@@ -12,9 +12,15 @@ config :lock_the_lock, LockTheLockWeb.Endpoint,
   http: [
     port: String.to_integer(System.fetch_env!("APP_PORT")),
     transport_options: [socket_opts: [:inet6]]
-  ],
-  cache_static_manifest: "priv/static/cache_manifest.json",
-  debug_errors: debug?,
-  code_reloader: debug?,
-  check_origin: !debug?,
-  server: !debug?
+  ]
+
+if debug? do
+  config :lock_the_lock, LockTheLockWeb.Endpoint,
+    debug_errors: true,
+    code_reloader: true
+else
+  config :lock_the_lock, LockTheLockWeb.Endpoint,
+    cache_static_manifest: "priv/static/cache_manifest.json",
+    check_origin: true,
+    server: true
+end

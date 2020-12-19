@@ -7,7 +7,7 @@ import "./Button.scss";
 type ButtonProps = {
   children: React.ReactNode;
   cta?: boolean;
-  onClick: () => void
+  onClick?: () => void
 };
 
 const Button = ({ children, cta = false, onClick }: ButtonProps) => {
@@ -16,11 +16,20 @@ const Button = ({ children, cta = false, onClick }: ButtonProps) => {
     "Button--cta": cta
   });
 
-  return (
-    <div className={className} onClick={(e) => { e.preventDefault(); onClick(); }}>
-      {children}
-    </div>
-  );
+  if (onClick) {
+    return (
+      <div className={className} onClick={(e) => { e.preventDefault(); onClick(); }}>
+        {children}
+      </div>
+    );
+  }
+  else {
+    return (
+      <button className={className}>
+        {children}
+      </button>
+    );
+  }
 };
 
 export default Button;

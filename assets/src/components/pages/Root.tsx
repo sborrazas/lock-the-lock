@@ -20,11 +20,12 @@ type Props = {
   title: string;
   children: React.ReactNode;
   isLanding?: boolean;
+  modal?: React.ReactNode;
 };
 
-export default ({ title, children, isLanding = false }: Props) => {
+export default ({ title, children, modal, isLanding = false }: Props) => {
   return (
-    <Layout isLanding={isLanding}>
+    <Layout isLanding={isLanding} modal={modal}>
       <LayoutHeader isLanding={isLanding}>
         <MainHeader logoSrc="/lock-the-lock.svg" title={title}>
           <MainHeaderNav>

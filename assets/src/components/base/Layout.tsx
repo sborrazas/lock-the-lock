@@ -7,10 +7,11 @@ import "./Layout.scss";
 
 type LayoutProps = {
   children: React.ReactNode;
-  isLanding: boolean
+  isLanding: boolean;
+  modal?: React.ReactNode;
 };
 
-const Layout = ({ children, isLanding }: LayoutProps) => {
+const Layout = ({ children, isLanding, modal }: LayoutProps) => {
   const className = cssClasses({
     "Layout": true,
     "Layout--landing": isLanding
@@ -115,5 +116,19 @@ const Aside = ({ children }: AsideProps) => {
   );
 };
 
-export { Header, Landing, Body, Footer, Content, Section, Aside };
+type ModalProps = {
+  title: string;
+  children: React.ReactNode;
+};
+
+const Modal = ({ title, children }: ModalProps) => {
+  return (
+    <section className="Layout-modal">
+      {title}
+      {children}
+    </section>
+  );
+};
+
+export { Header, Landing, Body, Footer, Content, Section, Aside, Modal };
 export default Layout;

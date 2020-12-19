@@ -2,12 +2,12 @@ import React from "react";
 
 import "./List.scss";
 
-type InstructionProps = {
+type ListProps = {
   children: React.ReactNode;
 };
 
-const List = ({ children }: InstructionProps) => {
-  return (<ul className="List">{ children }</ul>);
+const List = ({ children }: ListProps) => {
+  return (<ul className="List">{children}</ul>);
 };
 
 type ItemProps = {
@@ -15,16 +15,8 @@ type ItemProps = {
 };
 
 const Item = ({ children }: ItemProps) => {
-  return (<li className="List-item">{ children }</li>);
+  return (<li className="List-item">{children}</li>);
 };
 
-type StrongProps = {
-  children: React.ReactNode;
-};
-
-const Strong = ({ children }: StrongProps) => {
-  return (<strong className="List-strong">{ children }</strong>);
-};
-
-export { Item, Strong };
+export { Item };
 export default List;

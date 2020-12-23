@@ -14,10 +14,23 @@ type LayoutProps = {
 const Layout = ({ children, isLanding, modal }: LayoutProps) => {
   const className = cssClasses({
     "Layout": true,
-    "Layout--landing": isLanding
+    "Layout--landing": isLanding,
+    "Layout--withModal": !! modal
+  });
+  const overlayClassName = cssClasses({
+    "Layout-modalOverlay": true,
+    "Layout-modalOverlay--active": !! modal
   });
 
-  return (<div className={className}>{children}</div>);
+  return (
+    <div className={className}>
+      {
+        modal &&
+          (<div className={overlayClassName}><section className="Layout-modal">{modal}</section></div>)
+      }
+      {children}
+    </div>
+  );
 };
 
 type ContentProps = {
@@ -116,19 +129,5 @@ const Aside = ({ children }: AsideProps) => {
   );
 };
 
-type ModalProps = {
-  title: string;
-  children: React.ReactNode;
-};
-
-const Modal = ({ title, children }: ModalProps) => {
-  return (
-    <section className="Layout-modal">
-      {title}
-      {children}
-    </section>
-  );
-};
-
-export { Header, Landing, Body, Footer, Content, Section, Aside, Modal };
+export { Header, Landing, Body, Footer, Content, Section, Aside };
 export default Layout;

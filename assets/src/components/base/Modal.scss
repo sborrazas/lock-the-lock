@@ -1,0 +1,70 @@
+@import "./variables";
+
+.Modal {
+  background: rgb(255, 255, 255);
+  border-radius: 10px;
+  padding: 10px;
+  position: relative;
+}
+
+.Modal-header {
+  position: absolute;
+  left: 0;
+  margin: 0 auto;
+  right: 0;
+  text-align: center;
+  top: -20px;
+}
+
+.Modal-title {
+  background: blue;
+  border-radius: 5px;
+  display: inline-block;
+  font-size: 16px; /* */
+  font-weight: bold;
+  padding: 10px 20px;
+  text-transform: uppercase;
+}
+
+.Modal-body {
+  color: $Modal-body--color;
+  padding: 20px;
+}
+
+.Modal-closeBtn {
+  cursor: pointer;
+  display: block;
+  height: 30px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  transform: rotate(45deg);
+  width: 30px;
+}
+
+.Modal-closeBtn:before,
+.Modal-closeBtn:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  background: $Modal-closeBtn--color;
+}
+
+.Modal-closeBtn:hover:before,
+.Modal-closeBtn:hover:after {
+  background: $Modal-closeBtn-hover--color;
+}
+
+.Modal-closeBtn:before {
+  left: 50%;
+  width: 30%;
+  margin-left: -15%;
+  height: 100%;
+}
+
+.Modal-closeBtn:after {
+  top: 50%;
+  height: 30%;
+  margin-top: -15%;
+  width: 100%;
+}

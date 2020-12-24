@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import { cssClasses } from "../../helpers/css";
 
@@ -7,16 +8,20 @@ import "./Button.scss";
 type ButtonProps = {
   children: React.ReactNode;
   cta?: boolean;
-  onClick?: () => void
+  onClick?: () => void;
+  to?: string;
 };
 
-const Button = ({ children, cta = false, onClick }: ButtonProps) => {
+const Button = ({ children, cta = false, to, onClick }: ButtonProps) => {
   const className = cssClasses({
     "Button": true,
     "Button--cta": cta
   });
 
-  if (onClick) {
+  if (to) {
+    return (<Link className={className} to={to}>{children}</Link>);
+  }
+  else if (onClick) {
     return (
       <div className={className} onClick={(e) => { e.preventDefault(); onClick(); }}>
         {children}
@@ -24,11 +29,7 @@ const Button = ({ children, cta = false, onClick }: ButtonProps) => {
     );
   }
   else {
-    return (
-      <button className={className}>
-        {children}
-      </button>
-    );
+    return (<button className={className}>{children}</button>);
   }
 };
 

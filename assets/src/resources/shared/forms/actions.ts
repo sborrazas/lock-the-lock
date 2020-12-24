@@ -11,7 +11,6 @@ interface InitializeForm<T> extends Action {
 
 export const UPDATE_FIELDS =  "FORM__UPDATE_FIELDS";
 
-
 interface UpdateFieldsAction<T, K extends keyof T> extends Action {
   type: typeof UPDATE_FIELDS;
   payload: {

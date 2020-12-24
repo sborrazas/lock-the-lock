@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 import "./Form.scss";
 
@@ -8,20 +8,61 @@ export type FormProps = {
 };
 
 const Form = ({ children }: FormProps) => {
-  return (<ul className="Form">{ children }</ul>);
+  return (<form className="Form">{children}</form>);
+};
+
+type InputProps = {
+  name: string;
+  value: any;
+  onChange: (val: string) => void;
+};
+
+class TextInput extends React.Component<InputProps> {
+  render() {
+    const { name, value } = this.props;
+
+    return (
+      <input type="text" name={name} value={value} onChange={this._onChange} />
+    );
+  }
+
+  _onChange(e: ChangeEvent<HTMLInputElement>) {
+    const { onChange } = this.props;
+
+    onChange(e.target.value);
+  }
+};
+
+const CheckboxInput = ({ name, value }: InputProps) => {
+  return (<div></div>);
+};
+
+const TimespanInput = ({ name, value }: InputProps) => {
+  return (<div></div>);
 };
 
 type FieldType = "text" | "checkbox" | "timespan";
 
 export type FieldProps = {
-  name: string;
   type: FieldType;
   label: string;
-  value: any;
+} & InputProps;
+
+const INPUT_TYPE_MAP = {
+  "text": TextInput,
+  "checkbox": CheckboxInput,
+  "timespan": TimespanInput
 };
 
-const Field = ({ name, type, label }: FieldProps) => {
-  return (<li className="Form-item">{label}</li>);
+const Field = ({ name, type, label, value, onChange }: FieldProps) => {
+   const Input = INPUT_TYPE_MAP[type];
+
+  return (
+    <div className="Form-field">
+      <label htmlFor={""}>{label}</label>
+      <Input name={name} value={value} onChange={onChange} />
+    </div>
+  );
 };
 
 export { Field };

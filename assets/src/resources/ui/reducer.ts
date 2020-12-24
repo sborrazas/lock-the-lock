@@ -8,7 +8,7 @@ interface UiState {
 
 const initialState: UiState = {
   forms: {
-    createLock: formInitialState({ username: "", timeout: "" })
+    createLock: formInitialState({ username: "", timeout: "", is_timed: false })
   }
 };
 

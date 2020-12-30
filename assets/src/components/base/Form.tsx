@@ -18,6 +18,12 @@ type InputProps = {
 };
 
 class TextInput extends React.Component<InputProps> {
+  constructor(props: InputProps) {
+    super(props);
+
+    this._onChange = this._onChange.bind(this);
+  }
+
   render() {
     const { name, value } = this.props;
 

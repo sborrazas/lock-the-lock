@@ -13,11 +13,22 @@ export default function <T>(state: FormsState<T>, action: FormsActionTypes<T>): 
   switch (action.type) {
     case INITIALIZE:
       return {
-        ...state
+        ...state,
+        [action.payload.formName]: {
+          ...state[action.payload.formName],
+          initialized: true
+        }
       };
     case UPDATE_FIELDS:
       return {
-        ...state
+        ...state,
+        [action.payload.formName]: {
+          ...state[action.payload.formName],
+          entity: {
+            ...state[action.payload.formName].entity,
+            ...action.payload.changes
+          }
+        }
       };
     default:
       return state;

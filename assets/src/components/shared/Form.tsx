@@ -1,5 +1,5 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { connect } from "react-redux";
 
 import { RootState } from "../../resources/reducer";
 import UiForm, {
@@ -8,9 +8,10 @@ import UiForm, {
   FieldProps as UiFieldProps
 } from "../base/Form";
 import { Form as FormsForm } from "../../resources/shared/forms/reducer";
-import { updateField, FormsActionTypes } from "../../resources/shared/forms/actions";
+import { updateField } from "../../resources/shared/forms/actions";
 
 import { UiForms } from "../../resources/ui/types";
+import { selectForm } from "../../resources/ui/reducer";
 
 type FormProps<K extends keyof UiForms> = Omit<UiFormProps, "onSubmit"> & {
   children: React.ReactNode;
@@ -27,37 +28,55 @@ const Form = <T extends keyof UiForms>({ children, onSubmit, form }: FormProps<T
   );
 };
 
-const connector = connect((state: RootState) => {
-  return {
-  };
-}, { updateField });
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-type FieldProps<K extends keyof UiForms> = PropsFromRedux &
-                                           Omit<UiFieldProps, "name" | "value" | "onChange"> & {
+type OwnFieldProps<K extends keyof UiForms, F extends keyof UiForms[K] & string> = {
   formName: K;
+  name: F;
+};
+
+type PropsFromRedux<K extends keyof UiForms, F extends keyof UiForms[K] & string> = {
   form: FormsForm<UiForms[K]>;
-  name: keyof UiForms[K] & string;
+  updateField: (formName: K, changes: Partial<UiForms[K]>) => void;
 };
 
-const Field = <K extends keyof UiForms>({ formName, name, type, label, form, updateField }: FieldProps<K>) => {
-  const onChange = (val: any) => {
-    const changes: Partial<UiForms[K]> = {};
+type FieldProps<K extends keyof UiForms, F extends keyof UiForms[K] & string> =
+  PropsFromRedux<K, F> &
+  Omit<UiFieldProps, "name" | "value" | "onChange"> &
+  OwnFieldProps<K, F>;
 
-    changes[name] = val;
+class Field<K extends keyof UiForms, F extends keyof UiForms[K] & string> extends React.Component<FieldProps<K, F>> {
 
-    updateField(formName, changes);
+  render() {
+    const { formName, name, type, label, form, updateField } = this.props;
+
+    const onChange = (val: any) => {
+      const changes: Partial<UiForms[K]> = {};
+
+      changes[name] = val;
+
+      updateField(formName, changes);
+    };
+
+    return (
+      <UiFormField name={name} type={type} label={label} value={form.entity[name]} onChange={onChange} />
+    );
+  }
+};
+
+const mapStateToProps = <K extends keyof UiForms, F extends keyof UiForms[K] & string>(state: RootState, { formName, name }: OwnFieldProps<K, F>): { form: FormsForm<UiForms[K]> } => {
+  return {
+    form: selectForm(state.ui, formName) as FormsForm<UiForms[K]>
   };
-
-  return (
-    <UiFormField name={name} type={type} label={label} value={form.entity[name]} onChange={onChange} />
-  );
 };
 
-const ConnectedField = connector(Field);
+const ConnectedField = (<K extends keyof UiForms, F extends keyof UiForms[K] & string>() => {
+  return connect<{ form: FormsForm<UiForms[K]> },
+                 { updateField: (formName: K, changes: Partial<UiForms[K]>) => void},
+                 OwnFieldProps<K, F>,
+                 RootState>(mapStateToProps, { updateField })(Field as new(props: FieldProps<K, F>) => Field<K, F>);
+})();
 
 export {
   ConnectedField as Field
 };
+
 export default Form;

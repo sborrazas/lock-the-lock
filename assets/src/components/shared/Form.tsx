@@ -40,13 +40,13 @@ type PropsFromRedux<K extends keyof UiForms, F extends keyof UiForms[K] & string
 
 type FieldProps<K extends keyof UiForms, F extends keyof UiForms[K] & string> =
   PropsFromRedux<K, F> &
-  Omit<UiFieldProps, "name" | "value" | "onChange"> &
+  Omit<UiFieldProps, "id" | "name" | "value" | "onChange"> &
   OwnFieldProps<K, F>;
 
 class Field<K extends keyof UiForms, F extends keyof UiForms[K] & string> extends React.Component<FieldProps<K, F>> {
-
   render() {
     const { formName, name, type, label, form, updateField } = this.props;
+    const id = `${formName}_${name}`;
 
     const onChange = (val: any) => {
       const changes: Partial<UiForms[K]> = {};
@@ -57,7 +57,13 @@ class Field<K extends keyof UiForms, F extends keyof UiForms[K] & string> extend
     };
 
     return (
-      <UiFormField name={name} type={type} label={label} value={form.entity[name]} onChange={onChange} />
+      <UiFormField
+        id={id}
+        name={name}
+        type={type}
+        label={label}
+        value={form.entity[name]}
+        onChange={onChange} />
     );
   }
 };

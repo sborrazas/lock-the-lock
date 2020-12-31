@@ -1,9 +1,31 @@
-@import "./mixins";
+@import "./variables";
 
 .Form {
   padding: 0;
 }
 
 .Form-field {
-  margin-top: 10px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.Form-fieldLabel {
+  color: $Form-fieldLabel--color;
+  font-size: 1.15em; /* 15 / 13 */
+  display: block;
+  font-weight: bold;
+  padding: 5px 0;
+  text-transform: uppercase;
+}
+
+.Form-fieldInput {
+  border: 2px solid $Form-fieldInput--borderColor;
+  border-radius: 5px;
+  display: inline-block;
+  max-width: 200px;
+  padding: 5px;
+  width: 100%;
+}
+
+.Form-fieldInput--text {
 }

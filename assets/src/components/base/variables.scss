@@ -23,12 +23,16 @@ $color-1: $color-grayscale-8; /* White */
 $color-2: rgb(10, 94, 251); /* Blue */
 $color-3: rgb(255, 191, 0); /* Orange */
 $color-4: rgb(248, 248, 6); /* Yellow */
+$color-5: adjust-color($color-2, $lightness: -30%); /* Dark blue */
+$color-6: $color-grayscale-4; /* Gray */
 
 /* colors application */
 $base--color: $color-1;
 $base--backgroundColor: $color-2;
 $Button--backgroundColor: $color-3;
 $Button--color: $color-1;
+$Form-fieldLabel--color: $color-5;
+$Form-fieldInput--borderColor: $color-6;
 $Modal-closeBtn--color: $color-grayscale-3;
 $Modal-closeBtn-hover--color: $color-grayscale-2;
 $Modal-body--color: $color-grayscale-2;

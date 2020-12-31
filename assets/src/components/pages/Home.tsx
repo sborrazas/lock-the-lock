@@ -3,8 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 
 import Root from "./Root";
 import {
-  Landing as LayoutLanding,
-  Modal as LayoutModal
+  Landing as LayoutLanding
 } from "../base/Layout";
 import List, {
   Item as ListItem
@@ -21,7 +20,7 @@ const connector = connect((state: RootState) => { return {}; }, {});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type Props = PropsFromRedux & {
-  modal: React.ReactNode;
+  modal?: React.ReactNode;
 };
 
 const Home = ({ modal }: Props) => {
@@ -39,7 +38,7 @@ const Home = ({ modal }: Props) => {
             Press the <Strong>Unlock</Strong> button when to <Strong>release</Strong> the lock
           </ListItem>
         </List>
-        <Button cta onClick={() => console.log("GO TO /create")}>Create lock</Button>
+        <Button cta to="/create">Create lock</Button>
       </LayoutLanding>
     </Root>
   );

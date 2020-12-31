@@ -1,5 +1,4 @@
 import React from "react";
-import { cssClasses } from "../../helpers/css";
 
 import "./Modal.scss";
 

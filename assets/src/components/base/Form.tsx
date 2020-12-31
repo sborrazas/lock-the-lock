@@ -1,4 +1,5 @@
 import React, { ChangeEvent } from "react";
+import { cssClasses } from "../../helpers/css";
 
 import "./Form.scss";
 
@@ -17,6 +18,7 @@ type InputProps = {
   value: any;
   onChange: (val: any) => void;
   options?: Array<{ value: any, label: string }>;
+  inline?: boolean;
 };
 
 class TextInput extends React.Component<InputProps> {
@@ -83,14 +85,20 @@ class SelectInput extends React.Component<InputProps> {
   }
 
   render() {
-    const { id, name, value, options } = this.props;
+    const { id, name, value, options, inline } = this.props;
 
     if (!options) throw new Error("Invalid options"); // Run-time check :(
+
+    const className = cssClasses({
+      "Form-fieldInput": true,
+      "Form-fieldInput--select": true,
+      "Form-fieldInput--inline": !!inline
+    });
 
     return (
       <select
         id={id}
-        className="Form-fieldInput Form-fieldInput--select"
+        className={className}
         name={name}
         value={value}
         onChange={this._onChange}>
@@ -143,21 +151,23 @@ class TimespanInput extends React.Component<InputProps> {
     const [minutes, seconds] = parseTimespan(value);
 
     return (
-      <div>
+      <div className="Form-fieldInput Form-fieldInput--timespan">
         <SelectInput
           id={id}
           name={`${name}_minutes`}
+          inline={true}
           value={minutes}
           onChange={this._onChangeMinute}
           options={minutesOptions} />
-        minutes
+        min
         <SelectInput
           id={`${id}_seconds`}
           name={`${name}_seconds`}
+          inline={true}
           value={seconds}
           onChange={this._onChangeSecond}
           options={secondsOptions} />
-        seconds
+        sec
       </div>
     );
   }
@@ -201,5 +211,18 @@ const Field = (props: FieldProps) => {
   );
 };
 
-export { Field };
+export type NavProps = {
+  children: React.ReactNode;
+};
+
+const Nav = ({ children }: NavProps) => {
+  return (
+    <nav className="Form-nav">
+      {children}
+    </nav>
+  );
+};
+
+
+export { Field, Nav };
 export default Form;

@@ -5,7 +5,7 @@
 }
 
 .Form-field {
-  margin: 20px 0;
+  margin: 15px 0;
   text-align: center;
 }
 
@@ -19,13 +19,35 @@
 }
 
 .Form-fieldInput {
-  border: 2px solid $Form-fieldInput--borderColor;
-  border-radius: 5px;
   display: inline-block;
-  max-width: 200px;
-  padding: 5px;
   width: 100%;
 }
 
 .Form-fieldInput--text {
+  border: 3px solid $Form-fieldInput--borderColor;
+  border-radius: 5px;
+  max-width: 200px;
+  padding: 5px;
+}
+
+.Form-fieldInput--select {
+  border: 3px solid $Form-fieldInput--borderColor;
+  border-radius: 5px;
+  max-width: 200px;
+  padding: 5px;
+}
+
+.Form-fieldInput--timespan {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.Form-fieldInput--inline {
+  margin: 0 10px;
+  width: initial;
+}
+
+.Form-nav {
+  margin-top: 20px;
+  text-align: center;
 }

@@ -9,22 +9,18 @@ import {
 
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
+import NewLock from "./pages/NewLock";
 import Lock from "./pages/Lock";
 
 import { RootState } from "../resources/reducer";
-import { locks } from "../resources/selectors";
-import { createLock } from "../resources/locks/actions";
 
 const connector = connect((state: RootState) => {
-  return {
-    name: locks.selectLock(state)
-  };
-}, { createLock });
+  return {};
+}, {});
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type Props = PropsFromRedux & {
-  backgroundColor: string
 };
 
 const isValid = (lockId: string) => true;
@@ -32,7 +28,6 @@ const isValid = (lockId: string) => true;
 type FallbackRouteParams = { lockId: string };
 
 const FallbackRoute = ({ match, ...props }: RouteComponentProps<FallbackRouteParams>) => {
-  // const { params } = match;
   const { params: { lockId } } = match;
 
   if (isValid(lockId)) {
@@ -43,11 +38,12 @@ const FallbackRoute = ({ match, ...props }: RouteComponentProps<FallbackRoutePar
   }
 };
 
-const App = ({ name, backgroundColor, createLock }: Props) => {
+const App = ({ }: Props) => {
   return (
     <Router>
       <Switch>
         <Route exact path="/" component={Home} />
+        <Route exact path="/create" component={NewLock} />
         <Route exact path="/:lockId" component={FallbackRoute} />
       </Switch>
     </Router>

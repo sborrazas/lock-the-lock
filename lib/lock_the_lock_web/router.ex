@@ -10,5 +10,9 @@ defmodule LockTheLockWeb.Router do
 
   scope "/api", LockTheLockWeb.API do
     pipe_through :api
+
+    resources "/token", TokenController, singleton: true, only: [:show]
+
+    resources "/locks", LockController, only: [:create]
   end
 end

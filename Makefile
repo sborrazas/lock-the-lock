@@ -57,7 +57,7 @@ encrypt-env:
 									--output text \
 									--key-id $(KEY_ID) \
 									--query CiphertextBlob | base64 --decode >config/env/$(ENVIRONMENT).encrypted
-	rm config/env.$(ENVIRONMENT).plain
+	rm config/$(ENVIRONMENT).plain
 
 .PHONY: decrypt-env
 decrypt-env:

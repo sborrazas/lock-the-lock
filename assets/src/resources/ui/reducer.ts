@@ -9,7 +9,7 @@ export interface UiState {
 
 const initialState: UiState = {
   forms: {
-    createLock: formInitialState({ username: "", timeout: "01:00", is_timed: false })
+    createLock: formInitialState({ username: "", timeout: 60, is_timed: false })
   }
 };
 

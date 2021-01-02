@@ -104,7 +104,7 @@ class SelectInput extends React.Component<InputProps> {
         onChange={this._onChange}>
         {
           options.map(({ value, label }) => {
-            return (<option value={value}>{label}</option>);
+            return (<option key={value} value={value}>{label}</option>);
           })
         }
       </select>
@@ -118,18 +118,8 @@ class SelectInput extends React.Component<InputProps> {
   }
 };
 
-const parseTimespan = (val: string): [number, number] => {
-  const match = val.match(/^(\d\d):(\d\d)$/);
-
-  if (!match) throw new Error("Invalid timespan format");
-
-  return [parseInt(match[1], 10), parseInt(match[2], 10)];
-};
-
-const formatTimestamp = (min: number, sec: number): string => {
-  return [min, sec].map(n => {
-    return n < 10 ? `0${n}` : n;
-  }).join(":");
+const formatTimestamp = (n: number): string => {
+  return n < 10 ? `0${n}` : `${n}`;
 };
 
 class TimespanInput extends React.Component<InputProps> {
@@ -142,13 +132,14 @@ class TimespanInput extends React.Component<InputProps> {
 
   render() {
     const { id, name, value } = this.props;
-    const minutesOptions = Array.from(Array(10).keys()).map((n) => {
-      return { value: n, label: `${n}` };
+    const minutesOptions = Array.from(Array(11).keys()).map((n) => {
+      return { value: n, label: formatTimestamp(n) };
     });
-    const secondsOptions = Array.from(Array(59).keys()).map((n) => {
-      return { value: n, label: `${n}` };
+    const secondsOptions = Array.from(Array(60).keys()).map((n) => {
+      return { value: n, label: formatTimestamp(n) };
     });
-    const [minutes, seconds] = parseTimespan(value);
+    const minutes = Math.floor(value / 60);
+    const seconds = value % 60;
 
     return (
       <div className="Form-fieldInput Form-fieldInput--timespan">
@@ -172,18 +163,24 @@ class TimespanInput extends React.Component<InputProps> {
     );
   }
 
-  _onChangeMinute(minute: number) {
+  _onChangeMinute(minuteStr: string) {
+    const minute = parseInt(minuteStr, 10);
     const { value, onChange } = this.props;
-    const [, second] = parseTimespan(value);
+    const second = value % 60;
 
-    onChange(formatTimestamp(minute, second));
+    console.log("changing minute", value, minute);
+
+    onChange(minute * 60 + second);
   }
 
-  _onChangeSecond(second: number) {
+  _onChangeSecond(secondStr: string) {
+    const second = parseInt(secondStr, 10);
     const { value, onChange } = this.props;
-    const [minute,] = parseTimespan(value);
+    const minute = Math.floor(value / 60);
 
-    onChange(formatTimestamp(minute, second));
+    console.log("changing second", value, second);
+
+    onChange(minute * 60 + second);
   }
 };
 

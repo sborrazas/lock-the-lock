@@ -6,7 +6,6 @@ defmodule LockTheLock.Services.CreateLock do
   alias Ecto.Changeset
   alias LockTheLock.Locks
   alias LockTheLock.Locks.Lock
-  alias LockTheLock.Locks.Timeout
 
   embedded_schema do
     field(:username, :string)
@@ -16,7 +15,6 @@ defmodule LockTheLock.Services.CreateLock do
   @required_fields ~w(username timeout)a
   @optional_fields ~w()a
 
-  @timeout_format Timeout.format()
   @max_username_length 32
   @max_timeout 10 * 60 # 10mins
 
@@ -27,7 +25,7 @@ defmodule LockTheLock.Services.CreateLock do
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> validate_length(:username, min: 2, max: @max_username_length)
-    |> validate_number(:timeout, min: 0, max: @max_timeout)
+    |> validate_number(:timeout, greater_than_or_equal_to: 0, less_than_or_equal_to: @max_timeout)
     |> create_lock()
   end
 

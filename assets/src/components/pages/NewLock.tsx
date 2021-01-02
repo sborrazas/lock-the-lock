@@ -29,12 +29,20 @@ type Props = PropsFromRedux & {
 };
 
 const NewLock = ({ createLockForm, createLock }: Props) => {
+  let timeoutField;
+
+  if (createLockForm.entity.is_timed) {
+    timeoutField = (
+      <FormField formName="createLock" label="Timeout" type="timespan" name="timeout" />
+    );
+  }
+
   const modal = (
     <Modal title="Create Lock">
       <Form formName="createLock" form={createLockForm} onSubmit={(lock: Lock) => createLock(lock)}>
         <FormField formName="createLock" label="Username" type="text" name="username" />
         <FormField formName="createLock" label="Timed Lock" type="checkbox" name="is_timed" />
-        <FormField formName="createLock" label="Timeout" type="timespan" name="timeout" />
+        {timeoutField}
 
         <FormNav>
           <Button>Create</Button>

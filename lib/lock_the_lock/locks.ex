@@ -13,7 +13,7 @@ defmodule LockTheLock.Locks do
   def create(username, timeout) do
     now = DateTime.utc_now()
     datetime = now |> DateTime.to_unix() |> :binary.encode_unsigned()
-    text = datetime <> "asdhasjkdhaskdhajskdaskjd"
+    text = "#{datetime}#{timeout}"
 
     %Lock{
       id: encrypt(text),

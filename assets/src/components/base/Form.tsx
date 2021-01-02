@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, FormEvent } from "react";
 import { cssClasses } from "../../helpers/css";
 
 import "./Form.scss";
@@ -8,8 +8,28 @@ export type FormProps = {
   onSubmit: () => void;
 };
 
-const Form = ({ children }: FormProps) => {
-  return (<form className="Form">{children}</form>);
+class Form extends React.Component<FormProps> {
+  constructor(props: FormProps) {
+    super(props);
+
+    this._onSubmit = this._onSubmit.bind(this);
+  }
+
+  render() {
+    const { children } = this.props;
+
+    return (
+      <form className="Form" onSubmit={this._onSubmit}>{children}</form>
+    );
+  }
+
+  _onSubmit(e: FormEvent<HTMLFormElement>) {
+    const { onSubmit } = this.props;
+
+    e.preventDefault();
+
+    onSubmit();
+  }
 };
 
 type InputProps = {

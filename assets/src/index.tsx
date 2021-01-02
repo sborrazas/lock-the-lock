@@ -6,6 +6,9 @@ import App from "./components/App";
 import * as serviceWorker from "./serviceWorker";
 import createStore from "./store";
 
+import { fetchToken } from "./resources/token/actions";
+import { ActionTypes } from "./resources/actions";
+
 const store = createStore();
 
 ReactDOM.render(
@@ -14,6 +17,8 @@ ReactDOM.render(
   </Provider>,
   document.getElementById("root")
 );
+
+store.dispatch<ActionTypes>(fetchToken());
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

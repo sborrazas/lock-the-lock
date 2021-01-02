@@ -6,45 +6,35 @@ defmodule LockTheLock.Locks do
 
   @block_cipher :aes_gcm
   @aad "AES256GCM"
-  @iv_size 16
-  @tag_size 16
+  @iv_size 4
+  @tag_size 4
 
-  @spec create(String.t()) :: Lock.t()
-  def create(username) do
+  @spec create(String.t(), non_neg_integer()) :: Lock.t()
+  def create(username, timeout) do
     now = DateTime.utc_now()
     datetime = now |> DateTime.to_unix() |> :binary.encode_unsigned()
-    text = datetime
-
-    id = Crypto.encrypt(locks_secret_key(), text, @iv_size, @tag_size)
+    text = datetime <> "asdhasjkdhaskdhajskdaskjd"
 
     %Lock{
-      id: id,
+      id: encrypt(text),
       username: username,
-      index: :rand.uniform(0, 31)
-    }
-  end
-
-  @spec create(String.t(), Timeout.t()) :: Lock.t()
-  def create(username, timeout) do
-    locks_secret_key = Application.fetch_env!(:lock_the_lock, :locks_secret_key)
-
-    lock = create(username)
-
-    %Lock{
-      lock |
+      index: :rand.uniform(31),
       timeout: timeout
     }
   end
 
-  defp encrypt(key, text) do
+  defp encrypt(text) do
+    key = locks_secret_key()
     iv = :crypto.strong_rand_bytes(@iv_size)
 
     {ciphertext, ciphertag} =
       :crypto.block_encrypt(@block_cipher, key, iv, {@aad, text, @tag_size})
 
-    iv <> ciphertag <> ciphertext
+    (iv <> ciphertag <> ciphertext) |> Base.url_encode64(padding: false)
   end
 
-  defp locks_secret_key, do: Application.fetch_env!(:lock_the_lock, :locks_secret_key)
+  defp locks_secret_key do
+    Application.fetch_env!(:lock_the_lock, :locks_secret_key) |> Base.decode64!()
+  end
 
 end

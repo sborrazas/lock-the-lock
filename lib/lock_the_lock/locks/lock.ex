@@ -1,8 +1,7 @@
 defmodule LockTheLock.Locks.Lock do
 
-  alias LockTheLock.Locks.Timeout
-
-  defstruct [:id, :username, :index]
+  @derive Jason.Encoder
+  defstruct [:id, :username, :index, :timeout]
 
   @type id :: <<>>
 
@@ -10,7 +9,7 @@ defmodule LockTheLock.Locks.Lock do
     id: id,
     username: String.t(),
     index: non_neg_integer(),
-    timeout: Timeout.t() | nil
+    timeout: non_neg_integer()
   }
 
 end

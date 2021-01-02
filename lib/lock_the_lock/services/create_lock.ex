@@ -10,14 +10,15 @@ defmodule LockTheLock.Services.CreateLock do
 
   embedded_schema do
     field(:username, :string)
-    field(:timeout, :string)
+    field(:timeout, :integer)
   end
 
-  @required_fields ~w(username)a
-  @optional_fields ~w(timeout)a
+  @required_fields ~w(username timeout)a
+  @optional_fields ~w()a
 
   @timeout_format Timeout.format()
   @max_username_length 32
+  @max_timeout 10 * 60 # 10mins
 
   @spec run(map()) :: {:ok, Lock.t()} | {:error, Changeset.t()}
   def run(params) do
@@ -26,15 +27,7 @@ defmodule LockTheLock.Services.CreateLock do
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> validate_length(:username, min: 2, max: @max_username_length)
-    |> validate_format(:timeout, @timeout_format)
-    |> validate_change(:timeout, fn
-      :timeout, "00:00" -> [timeout: "can't be zero"]
-      :timeout, _timeout -> []
-    end)
-
-    IO.inspect([params, res])
-
-    res
+    |> validate_number(:timeout, min: 0, max: @max_timeout)
     |> create_lock()
   end
 
@@ -46,11 +39,6 @@ defmodule LockTheLock.Services.CreateLock do
       timeout: timeout
     } = Changeset.apply_changes(changeset)
 
-    create_lock(username, timeout)
+    {:ok, Locks.create(username, timeout)}
   end
-
-  def create_lock(username, nil), do: {:ok, Locks.create(username)}
-
-  def create_lock(username, timeout), do: {:ok, Locks.create(username, Timeout.parse(timeout))}
-
 end

@@ -1,8 +1,9 @@
 import { UiActionTypes } from "./actions";
 import { UiForms } from "./types";
-import formsReducer, { Form, FormsState, formInitialState } from "../shared/forms/reducer";
+import formsReducer, { formInitialState } from "../shared/forms/reducer";
+import { Form, FormsState } from "../shared/forms/types";;
 
-interface UiState {
+export interface UiState {
   forms: FormsState<UiForms>
 };
 

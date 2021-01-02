@@ -1,6 +1,7 @@
-import { CREATE_LOCK, LocksActionTypes, Lock } from "./actions";
+import { CREATE_LOCK, LocksActionTypes } from "./actions";
+import { Lock } from "./types";
 
-interface LocksState {
+export interface LocksState {
 };
 
 const initialState: LocksState = {

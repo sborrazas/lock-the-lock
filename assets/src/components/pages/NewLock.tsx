@@ -11,7 +11,8 @@ import Button from "../base/Button";
 import Modal from "../base/Modal";
 
 import { RootState } from "../../resources/reducer";
-import { createLock, Lock } from "../../resources/locks/actions";
+import { createLock } from "../../resources/locks/actions";
+import { Lock } from "../../resources/locks/types";
 import { ui } from "../../resources/selectors";
 
 import Home from "./Home";

@@ -1,14 +1,12 @@
 import { Observable } from "rxjs";
-import { Action } from "redux";
-import { ofType } from "redux-observable";
-import { ignoreElements, tap } from "rxjs/operators";
+import { ignoreElements } from "rxjs/operators";
 
-import { UiActionTypes } from "./actions";
+import { ActionTypes } from "../actions";
 
-export default function (action$: Observable<Action>): Observable<UiActionTypes> {
+import { UiState } from "./reducer";
+
+export default function (action$: Observable<ActionTypes>, state$: UiState): Observable<ActionTypes> {
   return action$.pipe(
-    // ofType(START_CREATING_LOCK),
-    // tap(item => console.log("ITEM", item)),
     ignoreElements()
   );
 };

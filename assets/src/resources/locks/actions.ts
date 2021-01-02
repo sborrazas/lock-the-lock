@@ -1,14 +1,10 @@
 import { Action } from "redux";
 
-export const CREATE_LOCK =  "LOCKS__CREATE_LOCK";
+import { Lock } from "./types";
 
-export type Lock = {
-  username: string;
-  timeout: string;
-  is_timed: boolean;
-};
+export const CREATE_LOCK = "LOCKS__CREATE_LOCK";
 
-interface CreateLockAction extends Action {
+export interface CreateLockAction extends Action {
   type: typeof CREATE_LOCK;
   payload: Lock
 };

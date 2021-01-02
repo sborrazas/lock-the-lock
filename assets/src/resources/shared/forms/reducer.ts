@@ -1,13 +1,5 @@
 import { INITIALIZE, UPDATE_FIELDS, FormsActionTypes } from "./actions";
-
-export type Form<T> = {
-  initialized: boolean;
-  entity: T;
-};
-
-export type FormsState<T> = {
-  [K in keyof T]: Form<T[K]>
-};
+import { FormsState, Form } from "./types";
 
 export default function <T>(state: FormsState<T>, action: FormsActionTypes<T>): FormsState<T> {
   switch (action.type) {

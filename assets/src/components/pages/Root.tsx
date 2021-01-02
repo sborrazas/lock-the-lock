@@ -21,11 +21,12 @@ type Props = {
   children: React.ReactNode;
   isLanding?: boolean;
   modal?: React.ReactNode;
+  onModalClose?: () => void;
 };
 
-export default ({ title, children, modal, isLanding = false }: Props) => {
+export default ({ title, children, modal, onModalClose, isLanding = false }: Props) => {
   return (
-    <Layout isLanding={isLanding} modal={modal}>
+    <Layout isLanding={isLanding} modal={modal} onModalClose={onModalClose}>
       <LayoutHeader isLanding={isLanding}>
         <MainHeader logoSrc="/lock-the-lock.svg" title={title}>
           <MainHeaderNav>

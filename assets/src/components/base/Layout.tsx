@@ -1,7 +1,7 @@
 import React from "react";
-// import logo from './logo.svg';
-// import { ReactComponent as Logo }
+import { MouseEvent } from "react";
 import { cssClasses } from "../../helpers/css";
+import { isInside } from "../../helpers/dom";
 
 import "./Layout.scss";
 
@@ -9,28 +9,56 @@ type LayoutProps = {
   children: React.ReactNode;
   isLanding: boolean;
   modal?: React.ReactNode;
+  onModalClose?: () => void;
 };
 
-const Layout = ({ children, isLanding, modal }: LayoutProps) => {
-  const className = cssClasses({
-    "Layout": true,
-    "Layout--landing": isLanding,
-    "Layout--withModal": !! modal
-  });
-  const overlayClassName = cssClasses({
-    "Layout-modalOverlay": true,
-    "Layout-modalOverlay--active": !! modal
-  });
+class Layout extends React.Component<LayoutProps, string, string> {
+  private modalRef = React.createRef<HTMLDivElement>();
 
-  return (
-    <div className={className}>
-      {
-        modal &&
-          (<div className={overlayClassName}><section className="Layout-modal">{modal}</section></div>)
-      }
+  constructor(props: LayoutProps) {
+    super(props);
+
+    this._onModalClose = this._onModalClose.bind(this);
+  }
+
+  render() {
+    const { children, isLanding, modal } = this.props;
+    const className = cssClasses({
+      "Layout": true,
+      "Layout--landing": isLanding,
+      "Layout--withModal": !! modal
+    });
+    const overlayClassName = cssClasses({
+      "Layout-modalOverlay": true,
+      "Layout-modalOverlay--active": !! modal
+    });
+
+    return (
+      <div className={className}>
+        {
+          modal &&
+            (
+              <div className={overlayClassName} onClick={this._onModalClose}>
+                <section ref={this.modalRef} className="Layout-modal">{modal}</section>
+              </div>
+            )
+        }
       {children}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  _onModalClose(e: MouseEvent<HTMLDivElement>) {
+    const { onModalClose } = this.props;
+    const currentModal = this.modalRef.current;
+    const relatedTarget = e.target as HTMLElement;
+
+    if (onModalClose && currentModal && relatedTarget) {
+      if (!isInside(relatedTarget, currentModal)) {
+        onModalClose();
+      }
+    }
+  }
 };
 
 type ContentProps = {

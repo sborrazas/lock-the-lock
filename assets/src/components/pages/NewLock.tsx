@@ -1,5 +1,8 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
+import {
+  RouteComponentProps
+} from "react-router-dom";
 
 import Form, {
   Field as FormField
@@ -17,6 +20,8 @@ import { ui } from "../../resources/selectors";
 
 import Home from "./Home";
 
+type OwnProps = RouteComponentProps & {};
+
 const connector = connect((state: RootState) => {
   return {
     createLockForm: ui.selectForm(state, "createLock")
@@ -25,10 +30,10 @@ const connector = connect((state: RootState) => {
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-type Props = PropsFromRedux & {
+type Props = OwnProps & PropsFromRedux & {
 };
 
-const NewLock = ({ createLockForm, createLock }: Props) => {
+const NewLock = ({ createLockForm, createLock, history }: Props) => {
   let timeoutField;
 
   if (createLockForm.entity.is_timed) {
@@ -38,7 +43,7 @@ const NewLock = ({ createLockForm, createLock }: Props) => {
   }
 
   const modal = (
-    <Modal title="Create Lock">
+    <Modal title="Create Lock" onModalClose={() => history.push("/")}>
       <Form formName="createLock" form={createLockForm} onSubmit={(lock: Lock) => createLock(lock)}>
         <FormField formName="createLock" label="Username" type="text" name="username" />
         <FormField formName="createLock" label="Timed Lock" type="checkbox" name="is_timed" />
@@ -52,7 +57,7 @@ const NewLock = ({ createLockForm, createLock }: Props) => {
   );
 
   return (
-    <Home modal={modal} />
+    <Home modal={modal} onModalClose={() => history.push("/")} />
   );
 };
 

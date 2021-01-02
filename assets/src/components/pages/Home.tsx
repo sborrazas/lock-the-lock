@@ -21,11 +21,12 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type Props = PropsFromRedux & {
   modal?: React.ReactNode;
+  onModalClose?: () => void;
 };
 
-const Home = ({ modal }: Props) => {
+const Home = ({ modal, onModalClose }: Props) => {
   return (
-    <Root title="Lock The Lock" isLanding modal={modal}>
+    <Root title="Lock The Lock" isLanding modal={modal} onModalClose={onModalClose}>
       <LayoutLanding>
         <List>
           <ListItem>

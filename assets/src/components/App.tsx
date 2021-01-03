@@ -1,11 +1,11 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import {
-  BrowserRouter as Router,
   Switch,
   Route,
   RouteComponentProps
 } from "react-router-dom";
+import { ConnectedRouter, ConnectedRouterProps } from "connected-react-router";
 
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
@@ -20,7 +20,7 @@ const connector = connect((state: RootState) => {
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-type Props = PropsFromRedux & {
+type Props = PropsFromRedux & ConnectedRouterProps & {
 };
 
 const isValid = (lockId: string) => true;
@@ -38,15 +38,15 @@ const FallbackRoute = ({ match, ...props }: RouteComponentProps<FallbackRoutePar
   }
 };
 
-const App = ({ }: Props) => {
+const App = ({ history }: Props) => {
   return (
-    <Router>
+    <ConnectedRouter history={history}>
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/create" component={NewLock} />
         <Route exact path="/:lockId" component={FallbackRoute} />
       </Switch>
-    </Router>
+    </ConnectedRouter>
   );
 };
 

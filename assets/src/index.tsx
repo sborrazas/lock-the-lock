@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { ConnectedRouter } from "connected-react-router";
 
 import "./components/base/index.scss";
 import App from "./components/App";
@@ -15,9 +14,7 @@ const store = createStore();
 
 ReactDOM.render(
   <Provider store={store}>
-    <ConnectedRouter history={history}>
-      <App />
-    </ConnectedRouter>
+    <App history={history} />
   </Provider>,
   document.getElementById("root")
 );

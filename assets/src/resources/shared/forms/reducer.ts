@@ -1,4 +1,4 @@
-import { INITIALIZE, UPDATE_FIELDS, FormsActionTypes } from "./actions";
+import { INITIALIZE, UPDATE_FIELDS, SET_ERRORS, FormsActionTypes } from "./actions";
 import { Form } from "../../../utils/forms";
 
 export type FormsState<T> = {
@@ -24,6 +24,14 @@ export default function <T>(state: FormsState<T>, action: FormsActionTypes<T>): 
             ...state[action.payload.formName].entity,
             ...action.payload.changes
           }
+        }
+      };
+    case SET_ERRORS:
+      return {
+        ...state,
+        [action.payload.formName]: {
+          ...state[action.payload.formName],
+          errors: action.payload.errors
         }
       };
     default:

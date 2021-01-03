@@ -37,6 +37,14 @@
   padding: 5px;
 }
 
+.Form-fieldInput--text.Form-fieldInput--invalid {
+  border-color: $Form-fieldInput-invalid--borderColor;
+}
+
+.Form-fieldInput--select.Form-fieldInput--invalid {
+  border-color: $Form-fieldInput-invalid--borderColor;
+}
+
 .Form-fieldInput--timespan {
   font-weight: bold;
   text-transform: uppercase;
@@ -45,6 +53,10 @@
 .Form-fieldInput--inline {
   margin: 0 10px;
   width: initial;
+}
+
+.Form-fieldErrors {
+  display: none;
 }
 
 .Form-nav {

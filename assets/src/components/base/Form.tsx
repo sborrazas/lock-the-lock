@@ -40,6 +40,7 @@ type InputProps = {
   onChange: (val: any) => void;
   options?: Array<{ value: any, label: string }>;
   inline?: boolean;
+  invalid: boolean;
 };
 
 class TextInput extends React.Component<InputProps> {
@@ -50,12 +51,18 @@ class TextInput extends React.Component<InputProps> {
   }
 
   render() {
-    const { id, name, value } = this.props;
+    const { id, name, value, invalid } = this.props;
+
+    const className = cssClasses({
+      "Form-fieldInput": true,
+      "Form-fieldInput--text": true,
+      "Form-fieldInput--invalid": invalid
+    });
 
     return (
       <input
         id={id}
-        className="Form-fieldInput Form-fieldInput--text"
+        className={className}
         type="text"
         name={name}
         value={value}
@@ -152,7 +159,7 @@ class TimespanInput extends React.Component<InputProps> {
   }
 
   render() {
-    const { id, name, value } = this.props;
+    const { id, name, value, invalid } = this.props;
     const minutesOptions = Array.from(Array(11).keys()).map((n) => {
       return { value: n, label: formatTimestamp(n) };
     });
@@ -168,6 +175,7 @@ class TimespanInput extends React.Component<InputProps> {
           id={id}
           name={`${name}_minutes`}
           inline={true}
+          invalid={invalid}
           value={minutes}
           onChange={this._onChangeMinute}
           options={minutesOptions} />
@@ -176,6 +184,7 @@ class TimespanInput extends React.Component<InputProps> {
           id={`${id}_seconds`}
           name={`${name}_seconds`}
           inline={true}
+          invalid={invalid}
           value={seconds}
           onChange={this._onChangeSecond}
           options={secondsOptions} />
@@ -189,8 +198,6 @@ class TimespanInput extends React.Component<InputProps> {
     const { value, onChange } = this.props;
     const second = value % 60;
 
-    console.log("changing minute", value, minute);
-
     onChange(minute * 60 + second);
   }
 
@@ -199,33 +206,15 @@ class TimespanInput extends React.Component<InputProps> {
     const { value, onChange } = this.props;
     const minute = Math.floor(value / 60);
 
-    console.log("changing second", value, second);
-
     onChange(minute * 60 + second);
   }
-};
-
-type FieldErrorsProps = {
-  errors: Array<FError>;
-};
-
-const FieldErrors = ({ errors }: FieldErrorsProps) => {
-  return (
-    <ul>
-      {
-        errors.map(() => {
-          return (<li>Err</li>);
-        })
-      }
-    </ul>
-  );
 };
 
 export type FieldProps = {
   type: "text" | "timespan" | "checkbox" | "select",
   label: string;
   errors?: Array<FError>;
-} & InputProps;
+} & Omit<InputProps, "invalid">;
 
 const INPUT_TYPE_MAP = {
   "text": TextInput,
@@ -241,10 +230,18 @@ const Field = (props: FieldProps) => {
   return (
     <div className="Form-field">
       <label className="Form-fieldLabel" htmlFor={id}>{label}</label>
-      <Input {...props} />
+      <Input invalid={(!!errors) && errors.length > 0} {...props} />
       {
         errors &&
-          <FieldErrors errors={errors} />
+          (
+            <ul className="Form-fieldErrors">
+              {
+                errors.map((err, index) => {
+                  return (<li key={index}>Err</li>);
+                })
+              }
+            </ul>
+          )
       }
     </div>
   );

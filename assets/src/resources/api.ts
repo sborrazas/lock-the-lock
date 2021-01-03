@@ -1,11 +1,9 @@
 import { Observable, of } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
-import { ignoreElements, catchError, map, mergeMap } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 
 import { Lock } from "./locks/types";
 import { Token } from "./token/types";
-
-import { ActionTypes } from "./actions";
 
 import { Errors } from "../utils/forms";
 
@@ -47,7 +45,6 @@ export const locks = {
       body: lock
     }).pipe(
       map<AjaxResponse, Response<Lock>>(({ response, status }: AjaxResponse) => {
-        console.log("RESPONSE", response);
         if (status >= 200 && status < 300) {
           return { type: SUCCESS, entity: response as Lock };
         }

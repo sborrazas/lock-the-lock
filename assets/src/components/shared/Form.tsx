@@ -7,7 +7,7 @@ import UiForm, {
   FormProps as UiFormProps,
   FieldProps as UiFieldProps
 } from "../base/Form";
-import { Form as FormsForm, FError as FormsError } from "../../utils/forms";
+import { Form as FormsForm } from "../../utils/forms";
 import { updateField } from "../../resources/shared/forms/actions";
 
 import { UiForms } from "../../resources/ui/types";

@@ -1,15 +1,17 @@
 import { Action } from "redux";
 
-export const INITIALIZE = "FORM__INITIALIZE";
+import { Errors } from "../../../utils/forms";
 
-interface InitializeForm<T> extends Action {
+export const INITIALIZE = "FORM__INITIALIZE";
+export const UPDATE_FIELDS =  "FORM__UPDATE_FIELDS";
+export const SET_ERRORS =  "FORM__SET_ERRORS";
+
+interface InitializeFormAction<T> extends Action {
   type: typeof INITIALIZE,
   payload: {
     formName: keyof T;
   }
 };
-
-export const UPDATE_FIELDS =  "FORM__UPDATE_FIELDS";
 
 interface UpdateFieldsAction<T, K extends keyof T> extends Action {
   type: typeof UPDATE_FIELDS;
@@ -19,7 +21,17 @@ interface UpdateFieldsAction<T, K extends keyof T> extends Action {
   }
 };
 
-export type FormsActionTypes<T> = InitializeForm<T> | UpdateFieldsAction<T, keyof T>;
+interface SetErrorsAction<T, K extends keyof T> extends Action {
+  type: typeof SET_ERRORS;
+  payload: {
+    formName: K;
+    errors: Errors<T[K]>;
+  }
+};
+
+export type FormsActionTypes<T> = InitializeFormAction<T> |
+                                  UpdateFieldsAction<T, keyof T> |
+                                  SetErrorsAction<T, keyof T>;
 
 export function initializeForm<T>(formName: keyof T): FormsActionTypes<T> {
   return {
@@ -36,6 +48,16 @@ export function updateField<T, K extends keyof T>(formName: K, changes: Partial<
     payload: {
       formName,
       changes
+    }
+  };
+};
+
+export function setErrors<T, K extends keyof T>(formName: K, errors: Errors<T[K]>): FormsActionTypes<T> {
+  return {
+    type: SET_ERRORS,
+    payload: {
+      formName,
+      errors
     }
   };
 };

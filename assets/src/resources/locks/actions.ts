@@ -23,11 +23,25 @@ export interface CreateLockFailureAction extends Action {
   payload: Errors<Lock>;
 };
 
-export type LocksActionTypes = CreateLockAction;
+export type LocksActionTypes = CreateLockAction | CreateLockSuccessAction | CreateLockFailureAction;
 
 export function createLock(lock: Lock): LocksActionTypes {
   return {
     type: CREATE_LOCK,
     payload: lock
+  };
+};
+
+export function createLockSuccess(lock: Lock): LocksActionTypes {
+  return {
+    type: CREATE_LOCK_SUCCESS,
+    payload: lock
+  };
+};
+
+export function createLockFailure(errors: Errors<Lock>): LocksActionTypes {
+  return {
+    type: CREATE_LOCK_FAILURE,
+    payload: errors
   };
 };

@@ -1,24 +1,32 @@
+import { Action } from "redux";
 import { Observable } from "rxjs";
 import { ofType } from "redux-observable";
-import { ignoreElements, map, mergeMap } from "rxjs/operators";
+import { map, mergeMap } from "rxjs/operators";
 
-import { locks } from "../api";
+import { locks, SUCCESS, Response } from "../api";
 
-import { ActionTypes } from "../actions";
-
-import { CREATE_LOCK, LocksActionTypes, CreateLockAction } from "./actions";
-
+import {
+  CREATE_LOCK,
+  CreateLockAction,
+  createLockSuccess,
+  createLockFailure
+} from "./actions";
 import { LocksState } from "./reducer";
+import { Lock } from "./types";
 
-export default (action$: Observable<ActionTypes>, state: LocksState): Observable<ActionTypes> => {
-  console.log(state);
-
+export default (action$: Observable<Action>, state: LocksState): Observable<Action> => {
   return action$.pipe(
-    ofType<ActionTypes, CreateLockAction, LocksActionTypes["type"]>(CREATE_LOCK),
+    ofType<Action, CreateLockAction, typeof CREATE_LOCK>(CREATE_LOCK),
     mergeMap((item: CreateLockAction) => {
       return locks.create(item.payload).pipe(
-        map(response => { console.log("response", response); return ignoreElements(); }),
-        ignoreElements()
+        map((response: Response<Lock>) => {
+          if (response.type === SUCCESS) {
+            return createLockSuccess(response.entity);
+          }
+          else {
+            return createLockFailure(response.errors);
+          }
+        })
       );
     })
   );

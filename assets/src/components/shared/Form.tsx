@@ -7,7 +7,7 @@ import UiForm, {
   FormProps as UiFormProps,
   FieldProps as UiFieldProps
 } from "../base/Form";
-import { Form as FormsForm } from "../../resources/shared/forms/types";
+import { Form as FormsForm, FError as FormsError } from "../../utils/forms";
 import { updateField } from "../../resources/shared/forms/actions";
 
 import { UiForms } from "../../resources/ui/types";
@@ -40,7 +40,7 @@ type PropsFromRedux<K extends keyof UiForms, F extends keyof UiForms[K] & string
 
 type FieldProps<K extends keyof UiForms, F extends keyof UiForms[K] & string> =
   PropsFromRedux<K, F> &
-  Omit<UiFieldProps, "id" | "name" | "value" | "onChange"> &
+  Omit<UiFieldProps, "id" | "name" | "value" | "onChange" | "errors"> &
   OwnFieldProps<K, F>;
 
 class Field<K extends keyof UiForms, F extends keyof UiForms[K] & string> extends React.Component<FieldProps<K, F>> {
@@ -62,6 +62,7 @@ class Field<K extends keyof UiForms, F extends keyof UiForms[K] & string> extend
         name={name}
         type={type}
         label={label}
+        errors={form.errors[name] || []}
         value={form.entity[name]}
         onChange={onChange} />
     );

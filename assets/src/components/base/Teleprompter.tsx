@@ -1,7 +1,5 @@
 import React from "react";
 
-import { cssClasses } from "../../helpers/css";
-
 import "./Teleprompter.scss";
 
 type TeleprompterProps = {

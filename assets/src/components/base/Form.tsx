@@ -1,5 +1,6 @@
 import React, { ChangeEvent, FormEvent } from "react";
 import { cssClasses } from "../../helpers/css";
+import { FError } from "../../utils/forms";
 
 import "./Form.scss";
 
@@ -204,9 +205,26 @@ class TimespanInput extends React.Component<InputProps> {
   }
 };
 
+type FieldErrorsProps = {
+  errors: Array<FError>;
+};
+
+const FieldErrors = ({ errors }: FieldErrorsProps) => {
+  return (
+    <ul>
+      {
+        errors.map(() => {
+          return (<li>Err</li>);
+        })
+      }
+    </ul>
+  );
+};
+
 export type FieldProps = {
   type: "text" | "timespan" | "checkbox" | "select",
   label: string;
+  errors?: Array<FError>;
 } & InputProps;
 
 const INPUT_TYPE_MAP = {
@@ -217,13 +235,17 @@ const INPUT_TYPE_MAP = {
 };
 
 const Field = (props: FieldProps) => {
-  const { id, label, type } = props;
+  const { id, label, type, errors } = props;
   const Input = INPUT_TYPE_MAP[type];
 
   return (
     <div className="Form-field">
       <label className="Form-fieldLabel" htmlFor={id}>{label}</label>
       <Input {...props} />
+      {
+        errors &&
+          <FieldErrors errors={errors} />
+      }
     </div>
   );
 };

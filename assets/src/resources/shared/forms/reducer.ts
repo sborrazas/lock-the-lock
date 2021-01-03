@@ -1,5 +1,9 @@
 import { INITIALIZE, UPDATE_FIELDS, FormsActionTypes } from "./actions";
-import { FormsState, Form } from "./types";
+import { Form } from "../../../utils/forms";
+
+export type FormsState<T> = {
+  [K in keyof T]: Form<T[K]>
+};
 
 export default function <T>(state: FormsState<T>, action: FormsActionTypes<T>): FormsState<T> {
   switch (action.type) {
@@ -30,6 +34,7 @@ export default function <T>(state: FormsState<T>, action: FormsActionTypes<T>): 
 export const formInitialState = <T>(entity: T): Form<T> => {
   return {
     initialized: false,
-    entity
+    entity,
+    errors: {}
   };
 };

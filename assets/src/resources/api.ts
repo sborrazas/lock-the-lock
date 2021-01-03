@@ -7,7 +7,7 @@ import { Token } from "./token/types";
 
 import { ActionTypes } from "./actions";
 
-import { Errors } from "./shared/forms/types";
+import { Errors } from "../utils/forms";
 
 export const SUCCESS = "SUCCESS";
 

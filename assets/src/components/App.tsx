@@ -31,7 +31,7 @@ const FallbackRoute = ({ match, ...props }: RouteComponentProps<FallbackRoutePar
   const { params: { lockId } } = match;
 
   if (isValid(lockId)) {
-    return (<Lock match={match} {...props}/>);
+    return (<Lock match={match} {...props} />);
   }
   else {
     return (<NotFound />);

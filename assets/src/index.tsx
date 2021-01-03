@@ -1,10 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
+import { ConnectedRouter } from "connected-react-router";
+
 import "./components/base/index.scss";
 import App from "./components/App";
 import * as serviceWorker from "./serviceWorker";
-import createStore from "./store";
+import createStore, { history } from "./store";
 
 import { fetchToken } from "./resources/token/actions";
 import { ActionTypes } from "./resources/actions";
@@ -13,7 +15,9 @@ const store = createStore();
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <ConnectedRouter history={history}>
+      <App />
+    </ConnectedRouter>
   </Provider>,
   document.getElementById("root")
 );

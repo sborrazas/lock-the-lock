@@ -15,7 +15,7 @@ import Modal from "../base/Modal";
 
 import { RootState } from "../../resources/reducer";
 import { createLock } from "../../resources/locks/actions";
-import { Lock } from "../../resources/locks/types";
+import { NewLock as NewLockT } from "../../resources/locks/types";
 import { ui } from "../../resources/selectors";
 
 import Home from "./Home";
@@ -44,7 +44,7 @@ const NewLock = ({ createLockForm, createLock, history }: Props) => {
 
   const modal = (
     <Modal title="Create Lock" onModalClose={() => history.push("/")}>
-      <Form formName="createLock" form={createLockForm} onSubmit={(lock: Lock) => createLock(lock)}>
+      <Form formName="createLock" form={createLockForm} onSubmit={(lock: NewLockT) => createLock(lock)}>
         <FormField formName="createLock" label="Username" type="text" name="username" />
         <FormField formName="createLock" label="Timed Lock" type="checkbox" name="is_timed" />
         {timeoutField}

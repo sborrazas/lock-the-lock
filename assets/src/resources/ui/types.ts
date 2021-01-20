@@ -1,3 +1,3 @@
-import { Lock } from "../locks/types";
+import { NewLock } from "../locks/types";
 
-export type UiForms = { createLock: Lock };
+export type UiForms = { createLock: NewLock };

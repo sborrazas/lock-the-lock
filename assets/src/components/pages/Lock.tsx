@@ -19,13 +19,16 @@ import Teleprompter, {
 } from "../base/Teleprompter";
 
 import { RootState } from "../../resources/reducer";
-import { createLock } from "../../resources/locks/actions";
+import { lockSubscribe, lockUnsubscribe } from "../../resources/locks/actions";
 
-const connector = connect((state: RootState) => { return {}; }, { createLock });
+type OwnProps = RouteComponentProps<{ lockId: string }> & {};
 
-type PropsFromRedux = ConnectedProps<typeof connector>;
+const connector = connect((state: RootState, { match: { params: { lockId } } }: OwnProps) => {
+  return {
+  };
+}, { lockSubscribe, lockUnsubscribe });
 
-type Props = PropsFromRedux & RouteComponentProps<{ lockId: string }> & {};
+type Props = OwnProps & ConnectedProps<typeof connector>;
 
 const users = [ // Hard-coded data for now
   { id: 1, colorNumber: 1, label: "aalice" },
@@ -39,45 +42,61 @@ const users = [ // Hard-coded data for now
 
 const selectedId = 4;
 
-const Home = ({ createLock, match: { params: { lockId } } }: Props) => {
-  return (
-    <Root title={`Lock ${lockId}`}>
-      <LayoutSection>
-        <Donut items={users} selectedId={selectedId} />
-      </LayoutSection>
-      <LayoutAside>
-        <Teleprompter itemsCount={3}>
-          <TeleprompterItem>
-            <Strong colorNumber={54}>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>john.doe</Strong> acquired the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> joined the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-        </Teleprompter>
-      </LayoutAside>
-    </Root>
-  );
+class Home extends React.Component<Props> {
+  componentDidMount() {
+    const { lockSubscribe, match: { params: { lockId } } } = this.props;
+
+    lockSubscribe(lockId, "asdsa");
+  }
+
+  componentWillUnmount() {
+    const { lockUnsubscribe, match: { params: { lockId } } } = this.props;
+
+    lockUnsubscribe(lockId);
+  }
+
+  render() {
+    const { match: { params: { lockId } } } = this.props;
+
+    return (
+      <Root title={`Lock ${lockId}`}>
+        <LayoutSection>
+          <Donut items={users} selectedId={selectedId} />
+        </LayoutSection>
+        <LayoutAside>
+          <Teleprompter itemsCount={3}>
+            <TeleprompterItem>
+              <Strong colorNumber={54}>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>john.doe</Strong> acquired the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> joined the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+          </Teleprompter>
+        </LayoutAside>
+      </Root>
+    );
+  }
 };
 
 export default connector(Home);

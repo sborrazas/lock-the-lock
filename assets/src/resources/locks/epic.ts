@@ -6,22 +6,22 @@ import { map, mergeMap } from "rxjs/operators";
 import { locks, SUCCESS, Response } from "../api";
 
 import {
-  CREATE_LOCK,
+  CREATE,
   CreateLockAction,
   createLockSuccess,
   createLockFailure
 } from "./actions";
 import { LocksState } from "./reducer";
-import { Lock } from "./types";
+import { NewLock, LockId } from "./types";
 
 export default (action$: Observable<Action>, state: LocksState): Observable<Action> => {
   return action$.pipe(
-    ofType<Action, CreateLockAction, typeof CREATE_LOCK>(CREATE_LOCK),
+    ofType<Action, CreateLockAction, typeof CREATE>(CREATE),
     mergeMap((item: CreateLockAction) => {
       return locks.create(item.payload).pipe(
-        map((response: Response<Lock>) => {
+        map((response: Response<NewLock, { id: LockId }>) => {
           if (response.type === SUCCESS) {
-            return createLockSuccess(response.entity);
+            return createLockSuccess(response.entity.id);
           }
           else {
             return createLockFailure(response.errors);

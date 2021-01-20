@@ -1,14 +1,116 @@
-import { CREATE_LOCK, CREATE_LOCK_SUCCESS, CREATE_LOCK_FAILURE, LocksActionTypes } from "./actions";
-import { Lock } from "./types";
+import {
+  CREATE,
+  CREATE_SUCCESS,
+  CREATE_FAILURE,
+  LOCK_SUBSCRIBE,
+  LOCK_SUBSCRIBE_SUCCESS,
+  LOCK_SUBSCRIBE_FAILURE,
+  LOCK_LOCK,
+  LOCK_UNLOCK,
+  LOCK_LOCKED,
+  LOCK_UNLOCKED,
+  LOCK_UPDATED,
+  LocksActionTypes
+} from "./actions";
 
-export interface LocksState {
-};
+import {
+  Lock,
+  LockId,
+  User,
+  LOCK_STATE_LOADING,
+  LOCK_STATE_SUCCESS,
+  LOCK_STATE_FAILED
+} from "./types";
 
-const initialState: LocksState = {
+export type LocksState = Record<LockId, Lock>;
+
+const initialState: LocksState = {};
+
+const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
+  if (state.state === LOCK_STATE_SUCCESS) {
+    switch (action.type) {
+      case LOCK_LOCKED:
+        return {
+          ...state,
+          lockedBy: action.payload.lockedBy,
+          lockedAt: action.payload.lockedAt
+        };
+      case LOCK_UNLOCKED:
+        return {
+          ...state,
+          lockedBy: null,
+          lockedAt: null
+        };
+      case LOCK_UPDATED:
+        return {
+          ...state,
+          timeout: action.payload.timeout,
+          users: action.payload.users,
+          currentUser: action.payload.currentUser,
+          lockedBy: action.payload.lockedBy,
+          lockedAt: action.payload.lockedAt
+        }
+      default:
+        return state;
+    }
+  }
+  else {
+    return state;
+  }
 };
 
 export default function (state = initialState, action: LocksActionTypes): LocksState {
   switch (action.type) {
+    case LOCK_SUBSCRIBE:
+      return {
+        ...state,
+        [action.payload.lockId]: {
+          state: LOCK_STATE_LOADING
+        }
+      };
+    case LOCK_SUBSCRIBE_SUCCESS:
+      return {
+        ...state,
+        [action.payload.lockId]: {
+          state: LOCK_STATE_SUCCESS,
+          timeout: action.payload.timeout,
+          users: action.payload.users,
+          currentUser: action.payload.currentUser,
+          lockedBy: action.payload.lockedBy,
+          lockedAt: action.payload.lockedAt
+        }
+      };
+    case LOCK_SUBSCRIBE_FAILURE:
+      return {
+        ...state,
+        [action.payload.lockId]: {
+          state: LOCK_STATE_FAILED,
+          error: action.payload.error
+        }
+      };
+    case LOCK_LOCK:
+      return {
+        ...state
+      };
+    case LOCK_UNLOCK:
+      return {
+        ...state
+      };
+    case LOCK_LOCKED:
+      return {
+        ...state,
+        [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)
+      };
+    case LOCK_UNLOCKED:
+      return {
+        ...state,
+        [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)
+      };
+    case LOCK_UPDATED:
+      return {
+        ...state,
+        [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)
+      };
     default:
       return state;
   }

@@ -31,7 +31,7 @@ export default ({ title, children, modal, onModalClose, isLanding = false }: Pro
         <MainHeader logoSrc="/lock-the-lock.svg" title={title}>
           <MainHeaderNav>
             <MainHeaderNavItem>
-              <Button onClick={() => alert("blah")}>
+              <Button to="/create">
                 Create new lock
               </Button>
             </MainHeaderNavItem>

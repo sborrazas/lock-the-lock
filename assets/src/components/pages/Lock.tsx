@@ -12,7 +12,6 @@ import {
 import {
   Strong
 } from "../base/Text";
-import Button from "../base/Button";
 import Donut from "../base/Donut";
 import Teleprompter, {
   Item as TeleprompterItem

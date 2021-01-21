@@ -9,8 +9,10 @@ import { UiState } from "./reducer";
 import {
   CREATE_SUCCESS,
   CREATE_FAILURE,
+  LOCK_SUBSCRIBE_FAILURE,
   CreateLockSuccessAction,
-  CreateLockFailureAction
+  CreateLockFailureAction,
+  LockSubscribeFailureAction
 } from "../locks/actions";
 
 import {
@@ -26,6 +28,10 @@ export default function (action$: Observable<Action>, state$: UiState): Observab
     action$.pipe(
       ofType<Action, CreateLockFailureAction, typeof CREATE_FAILURE>(CREATE_FAILURE),
       map(({ payload: errors }: CreateLockFailureAction) => setErrors("createLock", errors))
+    ),
+    action$.pipe(
+      ofType<Action, LockSubscribeFailureAction, typeof LOCK_SUBSCRIBE_FAILURE>(LOCK_SUBSCRIBE_FAILURE),
+      map(({ payload: { errors } }: LockSubscribeFailureAction) => setErrors("lockSettings", errors))
     )
   );
 };

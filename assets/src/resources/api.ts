@@ -56,6 +56,8 @@ export type LockSubInputMsg = LockSubInputLockMsg | LockSubInputUnlockMsg | Lock
 export const LOCK_SUB_OUTPUT_LOCKED = "LOCK_SUB_OUTPUT_LOCKED";
 export const LOCK_SUB_OUTPUT_UNLOCKED = "LOCK_SUB_OUTPUT_UNLOCKED";
 export const LOCK_SUB_OUTPUT_UPDATED = "LOCK_SUB_OUTPUT_UPDATED";
+export const LOCK_SUB_OUTPUT_FAILED = "LOCK_SUB_OUTPUT_FAILED";
+export const LOCK_SUB_OUTPUT_CRITICALLY_FAILED = "LOCK_SUB_OUTPUT_CRITICALLY_FAILED";
 
 type LockSubOutputLockedMsg = {
   type: typeof LOCK_SUB_OUTPUT_LOCKED;
@@ -78,7 +80,20 @@ type LockSubOutputUpdatedMsg = {
   timeout: number;
 };
 
-export type LockSubOutputMsg = LockSubOutputLockedMsg | LockSubOutputUnlockedMsg | LockSubOutputUpdatedMsg;
+type LockSubOutputFailedMsg = {
+  type: typeof LOCK_SUB_OUTPUT_FAILED;
+  lockId: LockId;
+  error: string;
+};
+
+type LockSubOutputCriticallyFailedMsg = {
+  type: typeof LOCK_SUB_OUTPUT_CRITICALLY_FAILED;
+  lockId: LockId;
+  error: string;
+};
+
+export type LockSubOutputMsg = LockSubOutputLockedMsg | LockSubOutputUnlockedMsg |
+  LockSubOutputUpdatedMsg | LockSubOutputFailedMsg | LockSubOutputCriticallyFailedMsg;
 
 export const locks = {
   create: (lock: NewLock): Observable<Response<NewLock, { id: LockId }>> => {

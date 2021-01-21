@@ -9,6 +9,8 @@ import {
   LOCK_SUB_OUTPUT_LOCKED,
   LOCK_SUB_OUTPUT_UNLOCKED,
   LOCK_SUB_OUTPUT_UPDATED,
+  LOCK_SUB_OUTPUT_FAILED,
+  LOCK_SUB_OUTPUT_CRITICALLY_FAILED,
   Response,
   LockSubInputMsg,
   LockSubOutputMsg
@@ -25,7 +27,9 @@ import {
   createLockFailure,
   lockLocked,
   lockUnlocked,
-  lockUpdated
+  lockUpdated,
+  lockFailed,
+  lockCriticallyFailed
 } from "./actions";
 import { LocksState } from "./reducer";
 import { NewLock, LockId } from "./types";
@@ -75,6 +79,16 @@ export default (action$: Observable<Action>, state: LocksState): Observable<Acti
                   msg.current_user,
                   msg.locked_by,
                   msg.timeout
+                );
+              case LOCK_SUB_OUTPUT_FAILED:
+                return lockFailed(
+                  lockId,
+                  msg.error
+                );
+              case LOCK_SUB_OUTPUT_CRITICALLY_FAILED:
+                return lockCriticallyFailed(
+                  lockId,
+                  msg.error
                 );
             }
           })

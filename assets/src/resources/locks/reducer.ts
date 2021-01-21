@@ -51,7 +51,7 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
           [action.payload.lockId]: {
             ...state,
             state: LOCK_STATE_FAILED,
-            error: action.payload.error
+            errors: action.payload.errors
           }
         };
       default:

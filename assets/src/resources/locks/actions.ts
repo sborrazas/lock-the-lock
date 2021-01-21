@@ -1,6 +1,6 @@
 import { Action } from "redux";
 
-import { NewLock, LockId, User } from "./types";
+import { LockSettings, NewLock, LockId, User } from "./types";
 
 import { Errors } from "../../utils/forms";
 
@@ -20,6 +20,8 @@ export const LOCK_UPDATE = "LOCKS__LOCK_UPDATE";
 export const LOCK_LOCKED = "LOCKS__LOCK_LOCKED";
 export const LOCK_UNLOCKED = "LOCKS__LOCK_UNLOCKED";
 export const LOCK_UPDATED = "LOCKS__LOCK_UPDATED";
+export const LOCK_FAILED = "LOCKS__LOCK_FAILED";
+export const LOCK_CRITICALLY_FAILED = "LOCKS__LOCK_CRITICALLY_FAILED";
 
 export const LOCK_UNSUBSCRIBE = "LOCKS__LOCK_UNSUBSCRIBE";
 
@@ -70,7 +72,7 @@ export interface LockSubscribeFailureAction extends Action {
   type: typeof LOCK_SUBSCRIBE_FAILURE;
   payload: {
     lockId: LockId;
-    error: string;
+    errors: Errors<LockSettings>;
   };
 };
 
@@ -129,11 +131,28 @@ export interface LockUpdatedAction extends Action {
   };
 };
 
+export interface LockFailedAction extends Action {
+  type: typeof LOCK_FAILED;
+  payload: {
+    lockId: LockId;
+    error: string;
+  };
+};
+
+export interface LockCriticallyFailedAction extends Action {
+  type: typeof LOCK_CRITICALLY_FAILED;
+  payload: {
+    lockId: LockId;
+    error: string;
+  };
+};
+
 export type LocksActionTypes = CreateLockAction | CreateLockSuccessAction | CreateLockFailureAction |
     LockInitializeAction | LockSubscribeAction | LockSubscribeSuccessAction |
     LockSubscribeFailureAction | LockUnsubscribeAction |
     LockLockAction | LockUnlockAction | LockUpdateAction | // Sub input
-    LockLockedAction | LockUnlockedAction | LockUpdatedAction; // Sub output
+    LockLockedAction | LockUnlockedAction | LockUpdatedAction | LockFailedAction | // Sub output..
+    LockCriticallyFailedAction; // Sub output
 
 export function createLock(newLock: NewLock): LocksActionTypes {
   return {
@@ -195,12 +214,12 @@ export function lockSubscribeSuccess(lockId: LockId,
   };
 };
 
-export function lockSubscribeFailure(lockId: LockId, error: string): LocksActionTypes {
+export function lockSubscribeFailure(lockId: LockId, errors: Errors<LockSettings>): LocksActionTypes {
   return {
     type: LOCK_SUBSCRIBE_FAILURE,
     payload: {
       lockId,
-      error
+      errors
     }
   };
 };
@@ -247,6 +266,26 @@ export function lockUpdated(lockId: LockId,
       currentUser,
       lockedBy,
       timeout
+    }
+  };
+};
+
+export function lockFailed(lockId: LockId, error: string) {
+  return {
+    type: LOCK_FAILED,
+    payload: {
+      lockId,
+      error
+    }
+  };
+};
+
+export function lockCriticallyFailed(lockId: LockId, error: string) {
+  return {
+    type: LOCK_CRITICALLY_FAILED,
+    payload: {
+      lockId,
+      error
     }
   };
 };

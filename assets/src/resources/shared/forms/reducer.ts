@@ -5,7 +5,7 @@ export type FormsState<T> = {
   [K in keyof T]: Form<T[K]>
 };
 
-export default function <T>(state: FormsState<T>, action: FormsActionTypes<T>): FormsState<T> {
+export default function <T, K extends keyof T>(state: FormsState<T>, action: FormsActionTypes<T, K>): FormsState<T> {
   switch (action.type) {
     case INITIALIZE:
       return {

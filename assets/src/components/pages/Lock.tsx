@@ -29,9 +29,9 @@ import Form, {
 
 import { RootState } from "../../resources/reducer";
 import { lockInitialize, lockSubscribe, lockUnsubscribe } from "../../resources/locks/actions";
-import { LockSettings as LockSettings } from "../../resources/ui/types";
 import { ui, locks } from "../../resources/selectors";
 import {
+  LockSettings,
   LOCK_STATE_UNINITIALIZED,
   LOCK_STATE_INITIALIZED,
   LOCK_STATE_SUCCESS
@@ -91,7 +91,7 @@ class Home extends React.Component<Props> {
         modal = (
           <Modal title="Lock Settings" onModalClose={() => history.push("/")}>
             <Form formName="lockSettings" form={lockSettingsForm} onSubmit={(settings: LockSettings) => lockInitialize(lockId, settings.username)}>
-              <FormField formName="createLock" label="Username" type="text" name="username" />
+              <FormField formName="lockSettings" label="Username" type="text" name="username" />
 
               <FormNav>
                 <Button>Save</Button>

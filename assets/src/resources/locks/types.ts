@@ -42,3 +42,14 @@ type LockFailed = BaseLock & {
 };
 
 export type Lock = LockUninitialized | LockInitialized | LockLoading | LockSuccess | LockFailed;
+
+// Forms
+export type NewLock = {
+  username: string;
+  timeout: number;
+  is_timed: boolean;
+};
+
+export type LockSettings = {
+  username: string;
+};

@@ -1,7 +1,6 @@
 import { UiActionTypes } from "./actions";
 import { UiForms } from "./types";
 import formsReducer, { formInitialState, FormsState } from "../shared/forms/reducer";
-import { Form } from "../../utils/forms";
 
 export interface UiState {
   forms: FormsState<UiForms>
@@ -9,7 +8,8 @@ export interface UiState {
 
 const initialState: UiState = {
   forms: {
-    createLock: formInitialState({ username: "", timeout: 60, is_timed: false })
+    createLock: formInitialState({ username: "", timeout: 60, is_timed: false }),
+    lockSettings: formInitialState({ username: "" })
   }
 };
 
@@ -23,6 +23,6 @@ export default function (state: UiState = initialState, action: UiActionTypes): 
   }
 };
 
-export function selectForm<K extends keyof UiForms>(state: UiState, name: K): Form<UiForms[K]> {
+export function selectForm<K extends keyof UiForms>(state: UiState, name: K): UiState["forms"][K] {
   return state.forms[name];
 };

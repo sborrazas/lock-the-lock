@@ -1,12 +1,4 @@
-export type NewLock = {
-  username: string;
-  timeout: number;
-  is_timed: boolean;
-};
-
-export type LockSettings = {
-  username: string;
-};
+import { NewLock, LockSettings } from "../locks/types";
 
 export type UiForms = {
   createLock: NewLock,

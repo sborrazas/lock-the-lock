@@ -6,10 +6,10 @@ export const INITIALIZE = "FORM__INITIALIZE";
 export const UPDATE_FIELDS =  "FORM__UPDATE_FIELDS";
 export const SET_ERRORS =  "FORM__SET_ERRORS";
 
-interface InitializeFormAction<T> extends Action {
+interface InitializeFormAction<T, K extends keyof T> extends Action {
   type: typeof INITIALIZE,
   payload: {
-    formName: keyof T;
+    formName: K;
   }
 };
 
@@ -29,11 +29,11 @@ interface SetErrorsAction<T, K extends keyof T> extends Action {
   }
 };
 
-export type FormsActionTypes<T> = InitializeFormAction<T> |
-                                  UpdateFieldsAction<T, keyof T> |
-                                  SetErrorsAction<T, keyof T>;
+export type FormsActionTypes<T, K extends keyof T> = InitializeFormAction<T, K> |
+                                                     UpdateFieldsAction<T, K> |
+                                                     SetErrorsAction<T, K>;
 
-export function initializeForm<T>(formName: keyof T): FormsActionTypes<T> {
+export function initializeForm<T>(formName: keyof T): FormsActionTypes<T, any> {
   return {
     type: INITIALIZE,
     payload: {
@@ -42,7 +42,7 @@ export function initializeForm<T>(formName: keyof T): FormsActionTypes<T> {
   };
 };
 
-export function updateField<T, K extends keyof T>(formName: K, changes: Partial<T[K]>): FormsActionTypes<T> {
+export function updateField<T, K extends keyof T>(formName: K, changes: Partial<T[K]>): FormsActionTypes<T, K> {
   return {
     type: UPDATE_FIELDS,
     payload: {
@@ -52,7 +52,7 @@ export function updateField<T, K extends keyof T>(formName: K, changes: Partial<
   };
 };
 
-export function setErrors<T, K extends keyof T>(formName: K, errors: Errors<T[K]>): FormsActionTypes<T> {
+export function setErrors<T, K extends keyof T>(formName: K, errors: Errors<T[K]>): FormsActionTypes<T, K> {
   return {
     type: SET_ERRORS,
     payload: {

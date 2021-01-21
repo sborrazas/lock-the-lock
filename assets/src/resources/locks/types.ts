@@ -20,12 +20,14 @@ type LockUninitialized = {
   state: typeof LOCK_STATE_UNINITIALIZED;
 };
 
-type LockInitialized = BaseLock & {
+type LockInitialized = {
   state: typeof LOCK_STATE_INITIALIZED;
+  username: string;
 };
 
-type LockLoading = BaseLock & {
+type LockLoading = {
   state: typeof LOCK_STATE_LOADING;
+  username: string;
 };
 
 type LockSuccess = BaseLock & {

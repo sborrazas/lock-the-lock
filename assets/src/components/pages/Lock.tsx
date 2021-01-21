@@ -65,7 +65,7 @@ class Home extends React.Component<Props> {
     const { lock, lockSubscribe, match: { params: { lockId } } } = this.props;
 
     if (lock.state === LOCK_STATE_INITIALIZED) {
-      lockSubscribe(lockId, lock.currentUser.username);
+      lockSubscribe(lockId, lock.username);
     }
   }
 

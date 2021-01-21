@@ -43,8 +43,7 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
           timeout: action.payload.timeout,
           users: action.payload.users,
           currentUser: action.payload.currentUser,
-          lockedBy: action.payload.lockedBy,
-          lockedAt: action.payload.lockedAt
+          lockedBy: action.payload.lockedBy
         }
       default:
         return state;
@@ -61,7 +60,8 @@ export default function (state = initialState, action: LocksActionTypes): LocksS
       return {
         ...state,
         [action.payload.lockId]: {
-          state: LOCK_STATE_LOADING
+          state: LOCK_STATE_LOADING,
+          currentUser: state[action.payload.lockId].currentUser
         }
       };
     case LOCK_SUBSCRIBE_SUCCESS:
@@ -80,6 +80,7 @@ export default function (state = initialState, action: LocksActionTypes): LocksS
       return {
         ...state,
         [action.payload.lockId]: {
+          currentUser: state[action.payload.lockId].currentUser,
           state: LOCK_STATE_FAILED,
           error: action.payload.error
         }
@@ -110,4 +111,8 @@ export default function (state = initialState, action: LocksActionTypes): LocksS
     default:
       return state;
   }
+};
+
+export function selectLock(state: LocksState, lockId: LockId): Lock {
+  return state[lockId];
 };

@@ -1,8 +1,9 @@
 import { Observable, of } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import { catchError, map } from "rxjs/operators";
+import { webSocket } from "rxjs/webSocket";
 
-import { NewLock, LockId } from "./locks/types";
+import { NewLock, LockId, User } from "./locks/types";
 import { Token } from "./token/types";
 
 import { Errors } from "../utils/forms";
@@ -34,6 +35,51 @@ export const token = {
   }
 };
 
+export const LOCK_SUB_INPUT_LOCK = "LOCK_SUB_INPUT_LOCK";
+export const LOCK_SUB_INPUT_UNLOCK = "LOCK_SUB_INPUT_UNLOCK";
+export const LOCK_SUB_INPUT_UPDATE = "LOCK_SUB_INPUT_UPDATE";
+
+type LockSubInputLockMsg = {
+  type: typeof LOCK_SUB_INPUT_LOCK;
+};
+
+type LockSubInputUnlockMsg = {
+  type: typeof LOCK_SUB_INPUT_UNLOCK;
+};
+
+type LockSubInputUpdateMsg = {
+  type: typeof LOCK_SUB_INPUT_UPDATE;
+};
+
+export type LockSubInputMsg = LockSubInputLockMsg | LockSubInputUnlockMsg | LockSubInputUpdateMsg;
+
+export const LOCK_SUB_OUTPUT_LOCKED = "LOCK_SUB_OUTPUT_LOCKED";
+export const LOCK_SUB_OUTPUT_UNLOCKED = "LOCK_SUB_OUTPUT_UNLOCKED";
+export const LOCK_SUB_OUTPUT_UPDATED = "LOCK_SUB_OUTPUT_UPDATED";
+
+type LockSubOutputLockedMsg = {
+  type: typeof LOCK_SUB_OUTPUT_LOCKED;
+  lockId: LockId;
+  locked_by: number;
+  locked_at: string;
+};
+
+type LockSubOutputUnlockedMsg = {
+  type: typeof LOCK_SUB_OUTPUT_UNLOCKED;
+  lockId: LockId;
+};
+
+type LockSubOutputUpdatedMsg = {
+  type: typeof LOCK_SUB_OUTPUT_UPDATED;
+  lockId: LockId;
+  users: Array<User>;
+  current_user: User;
+  locked_by: number | null;
+  timeout: number;
+};
+
+export type LockSubOutputMsg = LockSubOutputLockedMsg | LockSubOutputUnlockedMsg | LockSubOutputUpdatedMsg;
+
 export const locks = {
   create: (lock: NewLock): Observable<Response<NewLock, { id: LockId }>> => {
     return ajax({
@@ -60,6 +106,24 @@ export const locks = {
         else {
           throw error;
         }
+      })
+    );
+  },
+  subscribe: (lockId: LockId, username: string, input: Observable<LockSubInputMsg>): Observable<LockSubOutputMsg> => {
+    const subject = webSocket<LockSubOutputMsg>(`/locks/${lockId}`);
+
+    input.subscribe((inputMsg: LockSubInputMsg) => {
+      console.log(inputMsg);
+    });
+
+    return subject.pipe(
+      map((subjectMsg: LockSubOutputMsg) => {
+        console.log(subjectMsg);
+
+        return {
+          type: LOCK_SUB_OUTPUT_UNLOCKED,
+          lockId
+        };
       })
     );
   }

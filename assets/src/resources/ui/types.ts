@@ -1,3 +1,14 @@
-import { NewLock } from "../locks/types";
+export type NewLock = {
+  username: string;
+  timeout: number;
+  is_timed: boolean;
+};
 
-export type UiForms = { createLock: NewLock };
+export type LockSettings = {
+  username: string;
+};
+
+export type UiForms = {
+  createLock: NewLock,
+  lockSettings: LockSettings
+};

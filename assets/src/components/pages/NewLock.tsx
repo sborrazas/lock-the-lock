@@ -15,7 +15,7 @@ import Modal from "../base/Modal";
 
 import { RootState } from "../../resources/reducer";
 import { createLock } from "../../resources/locks/actions";
-import { NewLock as NewLockT } from "../../resources/locks/types";
+import { NewLock as NewLockT } from "../../resources/ui/types";
 import { ui } from "../../resources/selectors";
 
 import Home from "./Home";

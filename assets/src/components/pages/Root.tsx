@@ -16,15 +16,31 @@ import {
 import Button from "../base/Button";
 import Badge from "../base/Badge";
 
+type User = {
+  username: string;
+  colorNumber: number;
+};
+
 type Props = {
   title: string;
   children: React.ReactNode;
   isLanding?: boolean;
   modal?: React.ReactNode;
   onModalClose?: () => void;
+  user?: User;
 };
 
-export default ({ title, children, modal, onModalClose, isLanding = false }: Props) => {
+export default ({ title, children, modal, onModalClose, isLanding = false, user }: Props) => {
+  let userNavItem;
+
+  if (user) {
+    userNavItem = (
+      <MainHeaderNavItem>
+        <Badge onClick={() => alert("hello")} colorNumber={user.colorNumber}>{user.username}</Badge>
+      </MainHeaderNavItem>
+    );
+  }
+
   return (
     <Layout isLanding={isLanding} modal={modal} onModalClose={onModalClose}>
       <LayoutHeader isLanding={isLanding}>
@@ -35,9 +51,7 @@ export default ({ title, children, modal, onModalClose, isLanding = false }: Pro
                 Create new lock
               </Button>
             </MainHeaderNavItem>
-            <MainHeaderNavItem>
-              <Badge onClick={() => alert("hello")} colorNumber={(0 | Math.random() * 60) + 1}>sborrazas</Badge>
-            </MainHeaderNavItem>
+            {userNavItem}
           </MainHeaderNav>
         </MainHeader>
       </LayoutHeader>

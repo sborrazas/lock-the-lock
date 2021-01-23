@@ -50,6 +50,8 @@ const FAKE_USERS = [
 
 const FAKE_SELECTED_ID = 4;
 
+const DEFAULT_COLOR_NUMBER = 3;
+
 const FAKE_TELEPROMPTER_ITEMS: Array<number> = [
       // <TeleprompterItem>
       //   <Strong colorNumber={54}>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
@@ -123,6 +125,7 @@ class Lock extends React.Component<Props> {
   render() {
     const { lock, lockSettingsForm, match: { params: { lockId } }, history, lockSubscribe } = this.props;
     let modal;
+    let user;
 
     console.log("RENDERING LOCK", lock);
 
@@ -141,13 +144,23 @@ class Lock extends React.Component<Props> {
         </Modal>
       );
     }
+    else if (lock.state === LOCK_STATE_SUCCESS) {
+      const userTmp = lock.users.find(({ id }) => id === lock.userId);
+
+      if (userTmp) {
+        user = { colorNumber: userTmp.number, username: userTmp.username };
+      }
+    }
+    else if (lock.state === LOCK_STATE_INITIALIZED) {
+      user = { colorNumber: DEFAULT_COLOR_NUMBER, username: lock.username };
+    }
 
     const users = lock.state === LOCK_STATE_SUCCESS ? serializeUsers(lock.users) : FAKE_USERS;
     const teleprompterItems = lock.state === LOCK_STATE_SUCCESS ? [] : FAKE_TELEPROMPTER_ITEMS;
     const selectedId = lock.state === LOCK_STATE_SUCCESS ? lock.lockedBy : FAKE_SELECTED_ID;
 
     return (
-      <Root title={`Lock ${lockId}`} modal={modal}>
+      <Root title={`Lock ${lockId}`} modal={modal} user={user}>
         <LayoutSection>
           <Donut items={users} selectedId={selectedId} />
         </LayoutSection>

@@ -13,6 +13,7 @@ body {
   line-height: $base--lineHeight;
   min-height: 100%;
   margin: 0;
+  overflow-y: hidden;
   padding: 0;
 
   -webkit-font-smoothing: antialiased;

@@ -16,6 +16,7 @@ defmodule LockTheLock.Locks.Lock do
   }
 
   @max_users 32
+  @max_user_number 59
 
   @spec user_id(handle()) :: user_id()
   def user_id({_lock, user_id}), do: user_id
@@ -100,7 +101,7 @@ defmodule LockTheLock.Locks.Lock do
     if username_taken? do
       {:reply, {:error, :username_taken}, state}
     else
-      number = 1
+      number = find_available_number(users)
       new_state = %State{
         state |
         counter: counter + 1,
@@ -139,5 +140,14 @@ defmodule LockTheLock.Locks.Lock do
         %{id: id, username: username, number: number}
       end)
     end)
+  end
+
+  defp find_available_number(users) do
+    taken_numbers = Enum.map(users, fn {_id, _username, number} -> number end)
+
+    1..@max_user_number
+    |> Enum.reject(fn n -> Enum.member?(taken_numbers, n) end)
+    |> Enum.shuffle()
+    |> :erlang.hd()
   end
 end

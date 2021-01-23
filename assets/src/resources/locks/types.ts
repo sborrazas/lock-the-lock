@@ -1,9 +1,13 @@
+import { Errors } from "../../utils/forms";
+
 export type LockId = string;
 
+export type UserId = number;
+
 export type User = {
+  id: UserId;
   username: string;
-  id: number;
-  colorNumber: number;
+  number: number;
 };
 
 export const LOCK_STATE_UNINITIALIZED = "UNINITIALIZED";
@@ -13,7 +17,7 @@ export const LOCK_STATE_SUCCESS = "SUCCESS";
 export const LOCK_STATE_FAILED = "FAILED";
 
 type BaseLock = {
-  currentUser: User;
+  userId: UserId;
 };
 
 type LockUninitialized = {
@@ -27,7 +31,6 @@ type LockInitialized = {
 
 type LockLoading = {
   state: typeof LOCK_STATE_LOADING;
-  username: string;
 };
 
 type LockSuccess = BaseLock & {
@@ -38,9 +41,9 @@ type LockSuccess = BaseLock & {
   timeout: number;
 };
 
-type LockFailed = BaseLock & {
+type LockFailed = {
   state: typeof LOCK_STATE_FAILED;
-  error: string;
+  errors: Errors<LockSettings>;
 };
 
 export type Lock = LockUninitialized | LockInitialized | LockLoading | LockSuccess | LockFailed;

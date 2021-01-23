@@ -6,9 +6,12 @@ import { map, mergeMap } from "rxjs/operators";
 import {
   locks,
   SUCCESS,
+  LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS,
+  LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED,
   LOCK_SUB_OUTPUT_LOCKED,
   LOCK_SUB_OUTPUT_UNLOCKED,
-  LOCK_SUB_OUTPUT_UPDATED,
+  LOCK_SUB_OUTPUT_USER_ADDED,
+  LOCK_SUB_OUTPUT_TIMEOUT_UPDATED,
   LOCK_SUB_OUTPUT_FAILED,
   LOCK_SUB_OUTPUT_CRITICALLY_FAILED,
   Response,
@@ -25,9 +28,12 @@ import {
   LockLockAction,
   createLockSuccess,
   createLockFailure,
+  lockSubscribeSuccess,
+  lockSubscribeFailure,
   lockLocked,
   lockUnlocked,
-  lockUpdated,
+  lockUserAdded,
+  lockTimeoutUpdated,
   lockFailed,
   lockCriticallyFailed
 } from "./actions";
@@ -68,17 +74,36 @@ export default (action$: Observable<Action>, state: LocksState): Observable<Acti
         return locks.subscribe(lockId, item.payload.username, wsInputObservable).pipe(
           map<LockSubOutputMsg, Action>((msg: LockSubOutputMsg) => {
             switch (msg.type) {
-              case LOCK_SUB_OUTPUT_LOCKED:
-                return lockLocked(lockId, msg.locked_by, msg.locked_at);
-              case LOCK_SUB_OUTPUT_UNLOCKED:
-                return lockUnlocked(lockId);
-              case LOCK_SUB_OUTPUT_UPDATED:
-                return lockUpdated(
+              case LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS:
+                return lockSubscribeSuccess(
                   lockId,
                   msg.users,
-                  msg.current_user,
-                  msg.locked_by,
+                  msg.userId,
+                  msg.lockedBy,
+                  msg.lockedAt,
                   msg.timeout
+                );
+              case LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED:
+                return lockSubscribeFailure(
+                  lockId,
+                  msg.errors
+                );
+              case LOCK_SUB_OUTPUT_LOCKED:
+                return lockLocked(lockId, msg.lockedBy, msg.lockedAt);
+              case LOCK_SUB_OUTPUT_UNLOCKED:
+                return lockUnlocked(lockId);
+              case LOCK_SUB_OUTPUT_TIMEOUT_UPDATED:
+                return lockTimeoutUpdated(
+                  lockId,
+                  msg.userId,
+                  msg.timeout
+                );
+              case LOCK_SUB_OUTPUT_USER_ADDED:
+                return lockUserAdded(
+                  lockId,
+                  msg.id,
+                  msg.username,
+                  msg.number
                 );
               case LOCK_SUB_OUTPUT_FAILED:
                 return lockFailed(

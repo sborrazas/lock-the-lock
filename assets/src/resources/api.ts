@@ -1,9 +1,9 @@
 import { Observable, of } from "rxjs";
 import { ajax, AjaxResponse } from "rxjs/ajax";
 import { catchError, map } from "rxjs/operators";
-import { webSocket } from "rxjs/webSocket";
+import { Socket } from "phoenix";
 
-import { NewLock, LockId, User } from "./locks/types";
+import { NewLock, LockId, User, UserId, LockSettings } from "./locks/types";
 import { Token } from "./token/types";
 
 import { Errors } from "../utils/forms";
@@ -37,7 +37,7 @@ export const token = {
 
 export const LOCK_SUB_INPUT_LOCK = "LOCK_SUB_INPUT_LOCK";
 export const LOCK_SUB_INPUT_UNLOCK = "LOCK_SUB_INPUT_UNLOCK";
-export const LOCK_SUB_INPUT_UPDATE = "LOCK_SUB_INPUT_UPDATE";
+export const LOCK_SUB_INPUT_UPDATE_TIMEOUT = "LOCK_SUB_INPUT_UPDATE_TIMEOUT";
 
 type LockSubInputLockMsg = {
   type: typeof LOCK_SUB_INPUT_LOCK;
@@ -47,53 +47,75 @@ type LockSubInputUnlockMsg = {
   type: typeof LOCK_SUB_INPUT_UNLOCK;
 };
 
-type LockSubInputUpdateMsg = {
-  type: typeof LOCK_SUB_INPUT_UPDATE;
+type LockSubInputUpdateTimeoutMsg = {
+  type: typeof LOCK_SUB_INPUT_UPDATE_TIMEOUT;
+  timeout: number;
 };
 
-export type LockSubInputMsg = LockSubInputLockMsg | LockSubInputUnlockMsg | LockSubInputUpdateMsg;
+export type LockSubInputMsg = LockSubInputLockMsg | LockSubInputUnlockMsg | LockSubInputUpdateTimeoutMsg;
 
+export const LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS = "LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS";
+export const LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED = "LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED";
 export const LOCK_SUB_OUTPUT_LOCKED = "LOCK_SUB_OUTPUT_LOCKED";
 export const LOCK_SUB_OUTPUT_UNLOCKED = "LOCK_SUB_OUTPUT_UNLOCKED";
-export const LOCK_SUB_OUTPUT_UPDATED = "LOCK_SUB_OUTPUT_UPDATED";
+export const LOCK_SUB_OUTPUT_USER_ADDED = "LOCK_SUB_OUTPUT_USER_ADDED";
+export const LOCK_SUB_OUTPUT_TIMEOUT_UPDATED = "LOCK_SUB_OUTPUT_TIMEOUT_UPDATED";
 export const LOCK_SUB_OUTPUT_FAILED = "LOCK_SUB_OUTPUT_FAILED";
 export const LOCK_SUB_OUTPUT_CRITICALLY_FAILED = "LOCK_SUB_OUTPUT_CRITICALLY_FAILED";
 
+type LockSubOutputSubscribeSuccessMsg = {
+  type: typeof LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS;
+  userId: UserId;
+  users: Array<User>;
+  lockedBy: UserId | null;
+  lockedAt: string | null;
+  timeout: number;
+};
+
+type LockSubOutputSubscribeFailed = {
+  type: typeof LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED;
+  errors: Errors<LockSettings>;
+};
+
 type LockSubOutputLockedMsg = {
   type: typeof LOCK_SUB_OUTPUT_LOCKED;
-  lockId: LockId;
-  locked_by: number;
-  locked_at: string;
+  lockedBy: UserId;
+  lockedAt: string;
 };
 
 type LockSubOutputUnlockedMsg = {
   type: typeof LOCK_SUB_OUTPUT_UNLOCKED;
-  lockId: LockId;
 };
 
-type LockSubOutputUpdatedMsg = {
-  type: typeof LOCK_SUB_OUTPUT_UPDATED;
-  lockId: LockId;
-  users: Array<User>;
-  current_user: User;
-  locked_by: number | null;
+type LockSubOutputUserAddedMsg = {
+  type: typeof LOCK_SUB_OUTPUT_USER_ADDED;
+  id: UserId;
+  username: string;
+  number: number;
+};
+
+type LockSubOutputTimeoutUpdatedMsg = {
+  type: typeof LOCK_SUB_OUTPUT_TIMEOUT_UPDATED;
+  userId: UserId;
   timeout: number;
 };
 
 type LockSubOutputFailedMsg = {
   type: typeof LOCK_SUB_OUTPUT_FAILED;
-  lockId: LockId;
   error: string;
 };
 
 type LockSubOutputCriticallyFailedMsg = {
   type: typeof LOCK_SUB_OUTPUT_CRITICALLY_FAILED;
-  lockId: LockId;
   error: string;
 };
 
-export type LockSubOutputMsg = LockSubOutputLockedMsg | LockSubOutputUnlockedMsg |
-  LockSubOutputUpdatedMsg | LockSubOutputFailedMsg | LockSubOutputCriticallyFailedMsg;
+export type LockSubOutputMsg = LockSubOutputSubscribeSuccessMsg | LockSubOutputSubscribeFailed |
+  LockSubOutputLockedMsg | LockSubOutputUnlockedMsg | LockSubOutputTimeoutUpdatedMsg |
+  LockSubOutputUserAddedMsg |
+  LockSubOutputFailedMsg | LockSubOutputCriticallyFailedMsg;
+
+const BASE_URL = process.env.NODE_ENV === "development" ? "ws://localhost:4000" : "";
 
 export const locks = {
   create: (lock: NewLock): Observable<Response<NewLock, { id: LockId }>> => {
@@ -115,6 +137,7 @@ export const locks = {
       }),
       catchError((error) => {
         const { status, response } = error;
+
         if (status === 422) {
           return of<Response<NewLock, { id: LockId }>>({ type: ERROR, errors: response as Errors<NewLock> });
         }
@@ -125,22 +148,114 @@ export const locks = {
     );
   },
   subscribe: (lockId: LockId, username: string, input: Observable<LockSubInputMsg>): Observable<LockSubOutputMsg> => {
-    const subject = webSocket<LockSubOutputMsg>(`/locks/${lockId}`);
+    return new Observable((subject) => {
+      const socket = new Socket(`${BASE_URL}/locks`, {
+        // logger: ((kind, msg, data) => { console.log(`${kind}: ${msg}`, data) })
+      });
+      const channel = socket.channel(`locks:${lockId}`, { username });
 
-    input.subscribe((inputMsg: LockSubInputMsg) => {
-      console.log(inputMsg);
+      channel
+        .on("lock_locked", ({ user_id, timestamp }) => {
+          subject.next({
+            type: LOCK_SUB_OUTPUT_LOCKED,
+            lockedBy: user_id,
+            lockedAt: timestamp
+          });
+        });
+
+      channel
+        .on("lock_unlocked", () => {
+          subject.next({
+            type: LOCK_SUB_OUTPUT_UNLOCKED
+          });
+        });
+
+      channel
+        .on("user_added", ({ id, username, number }) => {
+          subject.next({
+            type: LOCK_SUB_OUTPUT_USER_ADDED,
+            id: id,
+            username,
+            number
+          });
+        });
+
+      channel
+        .on("timeout_updated", ({ user_id, timeout }) => {
+          subject.next({
+            type: LOCK_SUB_OUTPUT_TIMEOUT_UPDATED,
+            userId: user_id,
+            timeout
+          });
+        });
+
+      channel
+        .join()
+        .receive("ok", ({ user_id, users, locked_by, locked_at, timeout }) => {
+          subject.next({
+            type: LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS,
+            userId: user_id,
+            users: users,
+            lockedBy: locked_by,
+            lockedAt: locked_at,
+            timeout
+          });
+
+          input.subscribe((inputMsg: LockSubInputMsg) => {
+            console.log("INPUT", inputMsg);
+            switch (inputMsg.type) {
+              case LOCK_SUB_INPUT_LOCK:
+                channel.push("acquire_lock", {});
+                break;
+              case LOCK_SUB_INPUT_UNLOCK:
+                channel.push("release_lock", {});
+                break;
+              case LOCK_SUB_INPUT_UPDATE_TIMEOUT:
+                channel.push("update_timeout", { timeout: inputMsg.timeout });
+                break;
+            }
+            // TODO: channel.push("exit_lock", {});
+          });
+        })
+        .receive("error", ({ reason, errors }) => {
+          if (reason === "invalid") {
+            subject.next({
+              type: LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED,
+              errors
+            });
+          }
+          else {
+            subject.next({
+              type: LOCK_SUB_OUTPUT_CRITICALLY_FAILED,
+              error: reason
+            });
+          }
+          socket.disconnect();
+        })
+        .receive("timeout", () => {
+          console.log("CHANNEL JOIN TIMEOUT");
+
+          subject.next({
+            type: LOCK_SUB_OUTPUT_CRITICALLY_FAILED,
+            error: "Timeout"
+          });
+        });
+
+      socket.onError((reason) => {
+        console.log("SOCKET ERROR", reason);
+
+        subject.next({
+          type: LOCK_SUB_OUTPUT_CRITICALLY_FAILED,
+          error: reason
+        });
+      });
+
+      socket.onClose(() => {
+        console.log("ON CLOSE");
+      });
+
+      socket.connect();
     });
-
-    return subject.pipe(
-      map((subjectMsg: LockSubOutputMsg) => {
-        console.log(subjectMsg);
-
-        return {
-          type: LOCK_SUB_OUTPUT_UNLOCKED,
-          lockId
-        };
-      })
-    );
   }
 };
 

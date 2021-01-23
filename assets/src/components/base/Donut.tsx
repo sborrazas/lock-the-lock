@@ -6,14 +6,14 @@ import { cssClasses } from "../../helpers/css";
 import "./Donut.scss";
 
 type DonutItem = {
-  id: number,
-  colorNumber: number,
-  label: string
+  id: number;
+  colorNumber: number;
+  label: string;
 };
 
 type DonutProps = {
   items: Array<DonutItem>;
-  selectedId?: number;
+  selectedId: number | null;
 };
 
 const RADIUS = 30;
@@ -25,8 +25,6 @@ const Donut = ({ items, selectedId }: DonutProps) => {
   const selectedIndex = selectedId ? items.findIndex(i => i.id === selectedId) : -1;
   const arcs = computeArcs(items, selectedIndex, RADIUS);
   const globalRotate = selectedIndex === -1 ? 0 : (360 * (selectedIndex + 0.5) / total);
-
-  console.log("SELECTED INDEX", selectedIndex);
 
   return (
     <svg className="Donut" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin">

@@ -75,22 +75,13 @@ const mapStateToProps = <K extends keyof UiForms, F extends keyof UiForms[K] & s
 };
 
 const ConnectedField = (<K extends keyof UiForms, F extends keyof UiForms[K] & string>(): FunctionComponent<OwnFieldProps<K, F>> => {
-  const updateField2 = (formName: K, changes: Partial<UiForms[K]>) => updateField(formName, changes);
-
   return connect<{ form: FormsForm<UiForms[K]> },
                  { updateField: (formName: K, changes: Partial<UiForms[K]>) => void},
                  OwnFieldProps<K, F>,
-                 RootState>(mapStateToProps, { updateField: updateField2 })(Field as new(props: FieldProps<K, F>) => Field<K, F>);
+                 RootState>(mapStateToProps, { updateField })(Field as new(props: FieldProps<K, F>) => Field<K, F>);
 });
-
-const ConnectedField3 = <K extends keyof UiForms, F extends keyof UiForms[K] & string>(props: OwnFieldProps<K, F>) => {
-  const ConnectedField2 = ConnectedField<K, F>();
-
-  return (<ConnectedField2 {...props} />);
-};
-
 export {
-  ConnectedField3 as Field
+  ConnectedField
 };
 
 export default Form;

@@ -1,6 +1,6 @@
 import { Action } from "redux";
 
-import { LockSettings, NewLock, LockId, User } from "./types";
+import { LockSettings, NewLock, LockId, User, UserId } from "./types";
 
 import { Errors } from "../../utils/forms";
 
@@ -19,7 +19,8 @@ export const LOCK_UPDATE = "LOCKS__LOCK_UPDATE";
 
 export const LOCK_LOCKED = "LOCKS__LOCK_LOCKED";
 export const LOCK_UNLOCKED = "LOCKS__LOCK_UNLOCKED";
-export const LOCK_UPDATED = "LOCKS__LOCK_UPDATED";
+export const LOCK_USER_ADDED = "LOCKS__LOCK_USER_ADDED";
+export const LOCK_TIMEOUT_UPDATED = "LOCKS__LOCK_TIMEOUT_UPDATED";
 export const LOCK_FAILED = "LOCKS__LOCK_FAILED";
 export const LOCK_CRITICALLY_FAILED = "LOCKS__LOCK_CRITICALLY_FAILED";
 
@@ -27,7 +28,7 @@ export const LOCK_UNSUBSCRIBE = "LOCKS__LOCK_UNSUBSCRIBE";
 
 export interface CreateLockAction extends Action {
   type: typeof CREATE;
-  payload: NewLock
+  payload: NewLock;
 };
 
 export interface CreateLockSuccessAction extends Action {
@@ -60,8 +61,8 @@ export interface LockSubscribeSuccessAction extends Action {
   type: typeof LOCK_SUBSCRIBE_SUCCESS;
   payload: {
     lockId: LockId;
+    userId: UserId;
     users: Array<User>;
-    currentUser: User;
     lockedBy: number | null;
     lockedAt: string | null;
     timeout: number;
@@ -120,13 +121,21 @@ export interface LockUnlockedAction extends Action {
   };
 };
 
-export interface LockUpdatedAction extends Action {
-  type: typeof LOCK_UPDATED;
+export interface LockUserAddedAction extends Action {
+  type: typeof LOCK_USER_ADDED;
   payload: {
     lockId: LockId;
-    users: Array<User>;
-    currentUser: User;
-    lockedBy: number | null;
+    id: UserId;
+    username: string;
+    number: number;
+  };
+};
+
+export interface LockTimeoutUpdatedAction extends Action {
+  type: typeof LOCK_TIMEOUT_UPDATED;
+  payload: {
+    lockId: LockId;
+    userId: UserId;
     timeout: number;
   };
 };
@@ -151,8 +160,8 @@ export type LocksActionTypes = CreateLockAction | CreateLockSuccessAction | Crea
     LockInitializeAction | LockSubscribeAction | LockSubscribeSuccessAction |
     LockSubscribeFailureAction | LockUnsubscribeAction |
     LockLockAction | LockUnlockAction | LockUpdateAction | // Sub input
-    LockLockedAction | LockUnlockedAction | LockUpdatedAction | LockFailedAction | // Sub output..
-    LockCriticallyFailedAction; // Sub output
+    LockLockedAction | LockUnlockedAction | LockTimeoutUpdatedAction | LockFailedAction | // Sub output..
+    LockUserAddedAction | LockCriticallyFailedAction; // Sub output
 
 export function createLock(newLock: NewLock): LocksActionTypes {
   return {
@@ -197,7 +206,7 @@ export function lockSubscribe(lockId: LockId, username: string): LocksActionType
 
 export function lockSubscribeSuccess(lockId: LockId,
                                      users: Array<User>,
-                                     currentUser: User,
+                                     userId: UserId,
                                      lockedBy: number | null,
                                      lockedAt: string | null,
                                      timeout: number): LocksActionTypes {
@@ -205,8 +214,8 @@ export function lockSubscribeSuccess(lockId: LockId,
     type: LOCK_SUBSCRIBE_SUCCESS,
     payload: {
       lockId,
+      userId,
       users,
-      currentUser,
       lockedBy,
       lockedAt,
       timeout
@@ -253,19 +262,25 @@ export function lockUnlocked(lockId: LockId): LocksActionTypes {
   };
 };
 
-export function lockUpdated(lockId: LockId,
-                            users: Array<User>,
-                            currentUser: User,
-                            lockedBy: number | null,
-                            timeout: number): LocksActionTypes {
+export function lockTimeoutUpdated(lockId: LockId, userId: UserId, timeout: number): LocksActionTypes {
   return {
-    type: LOCK_UPDATED,
+    type: LOCK_TIMEOUT_UPDATED,
     payload: {
       lockId,
-      users,
-      currentUser,
-      lockedBy,
+      userId,
       timeout
+    }
+  };
+};
+
+export function lockUserAdded(lockId: LockId, id: UserId, username: string, number: number): LocksActionTypes {
+  return {
+    type: LOCK_USER_ADDED,
+    payload: {
+      lockId,
+      id,
+      username,
+      number
     }
   };
 };

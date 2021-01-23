@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 
 import Form, {
-  Field as FormField
+  ConnectedField
 } from "../shared/Form";
 import {
   Nav as FormNav
@@ -33,20 +33,24 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 type Props = OwnProps & PropsFromRedux & {
 };
 
+const UsernameField = ConnectedField<"createLock", "username">();
+const IsTimedField = ConnectedField<"createLock", "is_timed">();
+const TimeoutField = ConnectedField<"createLock", "timeout">();
+
 const NewLock = ({ createLockForm, createLock, history }: Props) => {
   let timeoutField;
 
   if (createLockForm.entity.is_timed) {
     timeoutField = (
-      <FormField formName="createLock" label="Timeout" type="timespan" name="timeout" />
+      <TimeoutField formName="createLock" label="Timeout" type="timespan" name="timeout" />
     );
   }
 
   const modal = (
     <Modal title="Create Lock" onModalClose={() => history.push("/")}>
       <Form formName="createLock" form={createLockForm} onSubmit={(lock: NewLockT) => createLock(lock)}>
-        <FormField formName="createLock" label="Username" type="text" name="username" />
-        <FormField formName="createLock" label="Timed Lock" type="checkbox" name="is_timed" />
+        <UsernameField formName="createLock" label="Username" type="text" name="username" />
+        <IsTimedField formName="createLock" label="Timed Lock" type="checkbox" name="is_timed" />
         {timeoutField}
 
         <FormNav>

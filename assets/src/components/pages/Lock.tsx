@@ -21,34 +21,24 @@ import Donut from "../base/Donut";
 import Teleprompter, {
   Item as TeleprompterItem
 } from "../base/Teleprompter";
-import FakeTeleprompter from "./Lock/FakeTeleprompter";
-import FakeDonut from "./Lock/FakeDonut";
 import Form, {
-  Field as FormField
+  ConnectedField
 } from "../shared/Form";
 
 import { RootState } from "../../resources/reducer";
-import { lockInitialize, lockSubscribe, lockUnsubscribe } from "../../resources/locks/actions";
+import { lockSubscribe, lockUnsubscribe } from "../../resources/locks/actions";
 import { ui, locks } from "../../resources/selectors";
 import {
   LockSettings,
+  User,
   LOCK_STATE_UNINITIALIZED,
+  LOCK_STATE_LOADING,
+  LOCK_STATE_FAILED,
   LOCK_STATE_INITIALIZED,
   LOCK_STATE_SUCCESS
 } from "../../resources/locks/types";
 
-type OwnProps = RouteComponentProps<{ lockId: string }> & {};
-
-const connector = connect((state: RootState, { match: { params: { lockId } } }: OwnProps) => {
-  return {
-    lock: locks.selectLock(state, lockId),
-    lockSettingsForm: ui.selectForm(state, "lockSettings")
-  };
-}, { lockInitialize, lockSubscribe, lockUnsubscribe });
-
-type Props = OwnProps & ConnectedProps<typeof connector>;
-
-const users = [ // Hard-coded data for now
+const FAKE_USERS = [
   { id: 1, colorNumber: 1, label: "aalice" },
   { id: 2, colorNumber: 39, label: "bbob" },
   { id: 3, colorNumber: 22, label: "mark" },
@@ -58,9 +48,56 @@ const users = [ // Hard-coded data for now
   { id: 7, colorNumber: 15, label: "pepe" }
 ];
 
-const selectedId = 4;
+const FAKE_SELECTED_ID = 4;
 
-class Home extends React.Component<Props> {
+const FAKE_TELEPROMPTER_ITEMS: Array<number> = [
+      // <TeleprompterItem>
+      //   <Strong colorNumber={54}>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
+      // </TeleprompterItem>
+      // <TeleprompterItem>
+      //   <Strong>john.doe</Strong> acquired the lock
+      // </TeleprompterItem>
+      // <TeleprompterItem>
+      //   <Strong>pepe</Strong> joined the lock
+      // </TeleprompterItem>
+      // <TeleprompterItem>
+      //   <Strong>pepe</Strong> left the lock
+      // </TeleprompterItem>
+      // <TeleprompterItem>
+      //   <Strong>pepe</Strong> left the lock
+      // </TeleprompterItem>
+      // <TeleprompterItem>
+      //   <Strong>pepe</Strong> left the lock
+      // </TeleprompterItem>
+      // <TeleprompterItem>
+      //   <Strong>pepe</Strong> left the lock
+      // </TeleprompterItem>
+      // <TeleprompterItem>
+      //   <Strong>pepe</Strong> left the lock
+      // </TeleprompterItem>
+      // <TeleprompterItem>
+      //   <Strong>pepe</Strong> left the lock
+      // </TeleprompterItem>
+];
+
+type OwnProps = RouteComponentProps<{ lockId: string }> & {};
+
+const connector = connect((state: RootState, { match: { params: { lockId } } }: OwnProps) => {
+  return {
+    lock: locks.selectLock(state, lockId),
+    lockSettingsForm: ui.selectForm(state, "lockSettings")
+  };
+}, { lockSubscribe, lockUnsubscribe });
+
+type Props = OwnProps & ConnectedProps<typeof connector>;
+
+const UsernameField = ConnectedField<"lockSettings", "username">();
+
+const serializeUsers = (users: Array<User>) => users.map(({ id, number, username }) => {
+  return { id, colorNumber: number, label: username };
+});
+
+class Lock extends React.Component<Props> {
   componentDidMount() {
     const { lock, lockSubscribe, match: { params: { lockId } } } = this.props;
 
@@ -70,83 +107,84 @@ class Home extends React.Component<Props> {
   }
 
   componentWillUnmount() {
-    const { lock, lockUnsubscribe, match: { params: { lockId } } } = this.props;
+    const { lockUnsubscribe, match: { params: { lockId } } } = this.props;
 
-    if (lock.state === LOCK_STATE_SUCCESS) {
-      lockUnsubscribe(lockId);
+    lockUnsubscribe(lockId);
+  }
+
+  componentDidUpdate() {
+    const { lock, lockSubscribe, match: { params: { lockId } } } = this.props;
+
+    if (lock.state === LOCK_STATE_INITIALIZED) {
+      lockSubscribe(lockId, lock.username);
     }
   }
 
   render() {
-    const { lock, lockSettingsForm, match: { params: { lockId } }, history, lockInitialize } = this.props;
-    let donut;
-    let teleprompter;
+    const { lock, lockSettingsForm, match: { params: { lockId } }, history, lockSubscribe } = this.props;
     let modal;
 
-    if (lock.state !== LOCK_STATE_SUCCESS) {
-      donut = (<FakeDonut />);
-      teleprompter = (<FakeTeleprompter />);
+    console.log("RENDERING LOCK", lock);
 
-      if (lock.state === LOCK_STATE_UNINITIALIZED) {
-        modal = (
-          <Modal title="Lock Settings" onModalClose={() => history.push("/")}>
-            <Form formName="lockSettings" form={lockSettingsForm} onSubmit={(settings: LockSettings) => lockInitialize(lockId, settings.username)}>
-              <FormField formName="lockSettings" label="Username" type="text" name="username" />
+    if (lock.state === LOCK_STATE_LOADING ||
+        lock.state === LOCK_STATE_UNINITIALIZED ||
+        lock.state === LOCK_STATE_FAILED) {
+      modal = (
+        <Modal title="Lock Settings" onModalClose={() => history.push("/")}>
+          <Form formName="lockSettings" form={lockSettingsForm} onSubmit={(settings: LockSettings) => lockSubscribe(lockId, settings.username)}>
+            <UsernameField formName="lockSettings" label="Username" type="text" name="username" />
 
-              <FormNav>
-                <Button>Save</Button>
-              </FormNav>
-            </Form>
-          </Modal>
-        );
-      }
-    }
-    else {
-      donut = (<Donut items={users} selectedId={selectedId} />);
-      teleprompter = (
-        <Teleprompter itemsCount={3}>
-          <TeleprompterItem>
-            <Strong colorNumber={54}>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>john.doe</Strong> acquired the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> joined the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-          <TeleprompterItem>
-            <Strong>pepe</Strong> left the lock
-          </TeleprompterItem>
-        </Teleprompter>
+            <FormNav>
+              <Button>Save</Button>
+            </FormNav>
+          </Form>
+        </Modal>
       );
     }
+
+    const users = lock.state === LOCK_STATE_SUCCESS ? serializeUsers(lock.users) : FAKE_USERS;
+    const teleprompterItems = lock.state === LOCK_STATE_SUCCESS ? [] : FAKE_TELEPROMPTER_ITEMS;
+    const selectedId = lock.state === LOCK_STATE_SUCCESS ? lock.lockedBy : FAKE_SELECTED_ID;
 
     return (
       <Root title={`Lock ${lockId}`} modal={modal}>
         <LayoutSection>
-          {donut}
+          <Donut items={users} selectedId={selectedId} />
         </LayoutSection>
         <LayoutAside>
-          {teleprompter}
+          <Teleprompter itemsCount={3}>
+            <TeleprompterItem>
+              <Strong colorNumber={54}>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>john.doe</Strong> acquired the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> joined the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+            <TeleprompterItem>
+              <Strong>pepe</Strong> left the lock
+            </TeleprompterItem>
+          </Teleprompter>
         </LayoutAside>
       </Root>
     );
   }
 };
 
-export default connector(Home);
+export default connector(Lock);

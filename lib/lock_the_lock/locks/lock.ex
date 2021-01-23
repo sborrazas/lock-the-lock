@@ -128,7 +128,9 @@ defmodule LockTheLock.Locks.Lock do
 
   @impl true
   def handle_cast({:exit_lock, user_id}, %State{users: users} = state) do
-    {:noreply, %State{state | users: Map.delete(users, user_id)}}
+    new_users = Enum.reject(users, fn {id, _username, _number} -> id == user_id end)
+
+    {:noreply, %State{state | users: new_users}}
   end
 
   defp extract_data(state) do

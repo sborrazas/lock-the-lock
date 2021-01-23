@@ -15,11 +15,12 @@ export const LOCK_SUBSCRIBE_FAILURE = "LOCKS__LOCK_SUBSCRIBE_FAILURE";
 export const LOCK_INITIALIZE = "LOCKS__LOCK_INITIALIZE";
 export const LOCK_LOCK = "LOCKS__LOCK_LOCK";
 export const LOCK_UNLOCK = "LOCKS__LOCK_UNLOCK";
-export const LOCK_UPDATE = "LOCKS__LOCK_UPDATE";
+export const LOCK_UPDATE_TIMEOUT = "LOCKS__LOCK_UPDATE_TIMEOUT";
 
 export const LOCK_LOCKED = "LOCKS__LOCK_LOCKED";
 export const LOCK_UNLOCKED = "LOCKS__LOCK_UNLOCKED";
 export const LOCK_USER_ADDED = "LOCKS__LOCK_USER_ADDED";
+export const LOCK_USER_REMOVED = "LOCKS__LOCK_USER_REMOVED";
 export const LOCK_TIMEOUT_UPDATED = "LOCKS__LOCK_TIMEOUT_UPDATED";
 export const LOCK_FAILED = "LOCKS__LOCK_FAILED";
 export const LOCK_CRITICALLY_FAILED = "LOCKS__LOCK_CRITICALLY_FAILED";
@@ -98,10 +99,11 @@ export interface LockUnlockAction extends Action {
   };
 };
 
-export interface LockUpdateAction extends Action {
-  type: typeof LOCK_UPDATE;
+export interface LockUpdateTimeoutAction extends Action {
+  type: typeof LOCK_UPDATE_TIMEOUT;
   payload: {
     lockId: LockId;
+    timeout: number;
   };
 };
 
@@ -128,6 +130,14 @@ export interface LockUserAddedAction extends Action {
     id: UserId;
     username: string;
     number: number;
+  };
+};
+
+export interface LockUserRemovedAction extends Action {
+  type: typeof LOCK_USER_REMOVED;
+  payload: {
+    lockId: LockId;
+    id: UserId;
   };
 };
 
@@ -159,9 +169,9 @@ export interface LockCriticallyFailedAction extends Action {
 export type LocksActionTypes = CreateLockAction | CreateLockSuccessAction | CreateLockFailureAction |
     LockInitializeAction | LockSubscribeAction | LockSubscribeSuccessAction |
     LockSubscribeFailureAction | LockUnsubscribeAction |
-    LockLockAction | LockUnlockAction | LockUpdateAction | // Sub input
+    LockLockAction | LockUnlockAction | LockUpdateTimeoutAction | // Sub input
     LockLockedAction | LockUnlockedAction | LockTimeoutUpdatedAction | LockFailedAction | // Sub output..
-    LockUserAddedAction | LockCriticallyFailedAction; // Sub output
+    LockUserAddedAction | LockUserRemovedAction | LockCriticallyFailedAction; // Sub output
 
 export function createLock(newLock: NewLock): LocksActionTypes {
   return {
@@ -281,6 +291,16 @@ export function lockUserAdded(lockId: LockId, id: UserId, username: string, numb
       id,
       username,
       number
+    }
+  };
+};
+
+export function lockUserRemoved(lockId: LockId, id: UserId): LocksActionTypes {
+  return {
+    type: LOCK_USER_REMOVED,
+    payload: {
+      lockId,
+      id
     }
   };
 };

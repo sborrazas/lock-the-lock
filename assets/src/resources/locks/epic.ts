@@ -11,9 +11,14 @@ import {
   LOCK_SUB_OUTPUT_LOCKED,
   LOCK_SUB_OUTPUT_UNLOCKED,
   LOCK_SUB_OUTPUT_USER_ADDED,
+  LOCK_SUB_OUTPUT_USER_REMOVED,
   LOCK_SUB_OUTPUT_TIMEOUT_UPDATED,
   LOCK_SUB_OUTPUT_FAILED,
   LOCK_SUB_OUTPUT_CRITICALLY_FAILED,
+  LOCK_SUB_INPUT_LOCK,
+  LOCK_SUB_INPUT_UNLOCK,
+  LOCK_SUB_INPUT_UPDATE_TIMEOUT,
+  LOCK_SUB_INPUT_EXIT,
   Response,
   LockSubInputMsg,
   LockSubOutputMsg
@@ -23,9 +28,15 @@ import {
   CREATE,
   LOCK_SUBSCRIBE,
   LOCK_LOCK,
+  LOCK_UNLOCK,
+  LOCK_UPDATE_TIMEOUT,
+  LOCK_UNSUBSCRIBE,
   CreateLockAction,
   LockSubscribeAction,
   LockLockAction,
+  LockUnlockAction,
+  LockUpdateTimeoutAction,
+  LockUnsubscribeAction,
   createLockSuccess,
   createLockFailure,
   lockSubscribeSuccess,
@@ -33,6 +44,7 @@ import {
   lockLocked,
   lockUnlocked,
   lockUserAdded,
+  lockUserRemoved,
   lockTimeoutUpdated,
   lockFailed,
   lockCriticallyFailed
@@ -41,11 +53,38 @@ import { LocksState } from "./reducer";
 import { NewLock, LockId } from "./types";
 
 export default (action$: Observable<Action>, state: LocksState): Observable<Action> => {
-  const wsInputObservable: Observable<LockSubInputMsg> = merge<Action, LockSubInputMsg>(
+  const wsInputObservable: Observable<LockSubInputMsg> = merge<LockSubInputMsg>(
     action$.pipe(
       ofType<Action, LockLockAction, typeof LOCK_LOCK>(LOCK_LOCK),
-      map((action: LockLockAction) => {
-        return 1;
+      map<LockLockAction, LockSubInputMsg>((action: LockLockAction) => {
+        return {
+          type: LOCK_SUB_INPUT_LOCK
+        };
+      })
+    ),
+    action$.pipe(
+      ofType<Action, LockUnlockAction, typeof LOCK_UNLOCK>(LOCK_UNLOCK),
+      map<LockUnlockAction, LockSubInputMsg>((action: LockUnlockAction) => {
+        return {
+          type: LOCK_SUB_INPUT_UNLOCK
+        };
+      })
+    ),
+    action$.pipe(
+      ofType<Action, LockUpdateTimeoutAction, typeof LOCK_UPDATE_TIMEOUT>(LOCK_UPDATE_TIMEOUT),
+      map<LockUpdateTimeoutAction, LockSubInputMsg>((action: LockUpdateTimeoutAction) => {
+        return {
+          type: LOCK_SUB_INPUT_UPDATE_TIMEOUT,
+          timeout: action.payload.timeout
+        };
+      })
+    ),
+    action$.pipe(
+      ofType<Action, LockUnsubscribeAction, typeof LOCK_UNSUBSCRIBE>(LOCK_UNSUBSCRIBE),
+      map<LockUnsubscribeAction, LockSubInputMsg>((action: LockUnsubscribeAction) => {
+        return {
+          type: LOCK_SUB_INPUT_EXIT
+        };
       })
     )
   );
@@ -104,6 +143,11 @@ export default (action$: Observable<Action>, state: LocksState): Observable<Acti
                   msg.id,
                   msg.username,
                   msg.number
+                );
+              case LOCK_SUB_OUTPUT_USER_REMOVED:
+                return lockUserRemoved(
+                  lockId,
+                  msg.id
                 );
               case LOCK_SUB_OUTPUT_FAILED:
                 return lockFailed(

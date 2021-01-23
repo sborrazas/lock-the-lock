@@ -81,11 +81,11 @@ defmodule LockTheLockWeb.LockChannel do
   def handle_in("exit_lock", _params, %Socket{assigns: assigns} = socket) do
     lock_handle = assigns.lock_handle
 
-    lock_data = Locks.exit_lock(lock_handle)
+    Locks.exit_lock(lock_handle)
 
-    broadcast!(socket, "lock_updated", lock_data)
+    broadcast!(socket, "user_removed", %{user_id: Lock.user_id(lock_handle)})
 
-    {:stop, :normal, socket}
+    {:stop, :left, socket}
   end
 
   def handle_in(_msg, _params, socket) do
@@ -114,5 +114,17 @@ defmodule LockTheLockWeb.LockChannel do
     broadcast!(socket, "user_added", %{id: user_id, username: username, number: number})
 
     {:noreply, socket}
+  end
+
+  def terminate({:shutdown, :left}, socket) do
+    IO.inspect(["left", socket.assigns.lock_handle])
+  end
+
+  def terminate({:shutdown, :closed}, %Socket{assigns: assigns} = socket) do
+    lock_handle = assigns.lock_handle
+
+    Locks.exit_lock(lock_handle)
+
+    broadcast!(socket, "user_removed", %{id: Lock.user_id(lock_handle)})
   end
 end

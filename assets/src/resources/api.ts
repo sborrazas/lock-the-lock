@@ -38,6 +38,7 @@ export const token = {
 export const LOCK_SUB_INPUT_LOCK = "LOCK_SUB_INPUT_LOCK";
 export const LOCK_SUB_INPUT_UNLOCK = "LOCK_SUB_INPUT_UNLOCK";
 export const LOCK_SUB_INPUT_UPDATE_TIMEOUT = "LOCK_SUB_INPUT_UPDATE_TIMEOUT";
+export const LOCK_SUB_INPUT_EXIT = "LOCK_SUB_INPUT_EXIT";
 
 type LockSubInputLockMsg = {
   type: typeof LOCK_SUB_INPUT_LOCK;
@@ -52,13 +53,19 @@ type LockSubInputUpdateTimeoutMsg = {
   timeout: number;
 };
 
-export type LockSubInputMsg = LockSubInputLockMsg | LockSubInputUnlockMsg | LockSubInputUpdateTimeoutMsg;
+type LockSubInputExitMsg = {
+  type: typeof LOCK_SUB_INPUT_EXIT;
+};
+
+export type LockSubInputMsg = LockSubInputLockMsg | LockSubInputUnlockMsg |
+  LockSubInputUpdateTimeoutMsg | LockSubInputExitMsg;
 
 export const LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS = "LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS";
 export const LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED = "LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED";
 export const LOCK_SUB_OUTPUT_LOCKED = "LOCK_SUB_OUTPUT_LOCKED";
 export const LOCK_SUB_OUTPUT_UNLOCKED = "LOCK_SUB_OUTPUT_UNLOCKED";
 export const LOCK_SUB_OUTPUT_USER_ADDED = "LOCK_SUB_OUTPUT_USER_ADDED";
+export const LOCK_SUB_OUTPUT_USER_REMOVED = "LOCK_SUB_OUTPUT_USER_REMOVED";
 export const LOCK_SUB_OUTPUT_TIMEOUT_UPDATED = "LOCK_SUB_OUTPUT_TIMEOUT_UPDATED";
 export const LOCK_SUB_OUTPUT_FAILED = "LOCK_SUB_OUTPUT_FAILED";
 export const LOCK_SUB_OUTPUT_CRITICALLY_FAILED = "LOCK_SUB_OUTPUT_CRITICALLY_FAILED";
@@ -94,6 +101,11 @@ type LockSubOutputUserAddedMsg = {
   number: number;
 };
 
+type LockSubOutputUserRemovedMsg = {
+  type: typeof LOCK_SUB_OUTPUT_USER_REMOVED;
+  id: UserId;
+};
+
 type LockSubOutputTimeoutUpdatedMsg = {
   type: typeof LOCK_SUB_OUTPUT_TIMEOUT_UPDATED;
   userId: UserId;
@@ -112,7 +124,7 @@ type LockSubOutputCriticallyFailedMsg = {
 
 export type LockSubOutputMsg = LockSubOutputSubscribeSuccessMsg | LockSubOutputSubscribeFailed |
   LockSubOutputLockedMsg | LockSubOutputUnlockedMsg | LockSubOutputTimeoutUpdatedMsg |
-  LockSubOutputUserAddedMsg |
+  LockSubOutputUserAddedMsg | LockSubOutputUserRemovedMsg |
   LockSubOutputFailedMsg | LockSubOutputCriticallyFailedMsg;
 
 const BASE_URL = process.env.NODE_ENV === "development" ? "ws://localhost:4000" : "";
@@ -174,9 +186,17 @@ export const locks = {
         .on("user_added", ({ id, username, number }) => {
           subject.next({
             type: LOCK_SUB_OUTPUT_USER_ADDED,
-            id: id,
+            id,
             username,
             number
+          });
+        });
+
+      channel
+        .on("user_removed", ({ id }) => {
+          subject.next({
+            type: LOCK_SUB_OUTPUT_USER_REMOVED,
+            id
           });
         });
 
@@ -202,7 +222,6 @@ export const locks = {
           });
 
           input.subscribe((inputMsg: LockSubInputMsg) => {
-            console.log("INPUT", inputMsg);
             switch (inputMsg.type) {
               case LOCK_SUB_INPUT_LOCK:
                 channel.push("acquire_lock", {});
@@ -213,8 +232,10 @@ export const locks = {
               case LOCK_SUB_INPUT_UPDATE_TIMEOUT:
                 channel.push("update_timeout", { timeout: inputMsg.timeout });
                 break;
+              case LOCK_SUB_INPUT_EXIT:
+                channel.push("exit_lock", {});
+                break;
             }
-            // TODO: channel.push("exit_lock", {});
           });
         })
         .receive("error", ({ reason, errors }) => {

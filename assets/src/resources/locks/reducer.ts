@@ -7,6 +7,7 @@ import {
   LOCK_LOCKED,
   LOCK_UNLOCKED,
   LOCK_USER_ADDED,
+  LOCK_USER_REMOVED,
   LOCK_TIMEOUT_UPDATED,
   LocksActionTypes
 } from "./actions";
@@ -52,6 +53,11 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
         return {
           ...state,
           users: usersAddedUsers
+        }
+      case LOCK_USER_REMOVED:
+        return {
+          ...state,
+          users: state.users.filter(({ id }) => id === action.payload.id)
         }
       default:
         return state;
@@ -121,6 +127,11 @@ export default function (state = initialState, action: LocksActionTypes): LocksS
         [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)
       };
     case LOCK_USER_ADDED:
+      return {
+        ...state,
+        [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)
+      };
+    case LOCK_USER_REMOVED:
       return {
         ...state,
         [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)

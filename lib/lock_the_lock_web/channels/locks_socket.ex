@@ -1,8 +1,8 @@
-defmodule LockTheLockWeb.UserSocket do
+defmodule LockTheLockWeb.LocksSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", LockTheLockWeb.RoomChannel
+  channel "locks:*", LockTheLockWeb.LockChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

@@ -18,10 +18,9 @@ defmodule LockTheLock.Services.CreateLock do
   @max_username_length 32
   @max_timeout 10 * 60 # 10mins
 
-  @spec run(map()) :: {:ok, Lock.t()} | {:error, Changeset.t()}
+  @spec run(map()) :: {:ok, Lock.id()} | {:error, Changeset.t()}
   def run(params) do
-    IO.inspect(params)
-    res = %__MODULE__{}
+    %__MODULE__{}
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> validate_length(:username, min: 2, max: @max_username_length)
@@ -33,10 +32,9 @@ defmodule LockTheLock.Services.CreateLock do
 
   def create_lock(changeset) do
     %__MODULE__{
-      username: username,
       timeout: timeout
     } = Changeset.apply_changes(changeset)
 
-    {:ok, Locks.create(username, timeout)}
+    {:ok, Locks.create_id(timeout)}
   end
 end

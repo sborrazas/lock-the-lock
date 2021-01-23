@@ -10,7 +10,7 @@ defmodule LockTheLockWeb.Endpoint do
     signing_salt: "VPTOOL5C"
   ]
 
-  socket "/socket", LockTheLockWeb.UserSocket,
+  socket "/locks", LockTheLockWeb.LocksSocket,
     websocket: true,
     longpoll: false
 

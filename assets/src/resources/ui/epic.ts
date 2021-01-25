@@ -1,7 +1,7 @@
 import { Action } from "redux";
-import { Observable, merge } from "rxjs";
+import { Observable, merge, of } from "rxjs";
 import { ofType } from "redux-observable";
-import { map } from "rxjs/operators";
+import { mergeMap, map } from "rxjs/operators";
 import { push } from "connected-react-router";
 
 import { UiState } from "./reducer";
@@ -12,7 +12,8 @@ import {
   LOCK_SUBSCRIBE_FAILURE,
   CreateLockSuccessAction,
   CreateLockFailureAction,
-  LockSubscribeFailureAction
+  LockSubscribeFailureAction,
+  lockInitialize
 } from "../locks/actions";
 
 import {
@@ -23,7 +24,9 @@ export default function (action$: Observable<Action>, state$: UiState): Observab
   return merge<Action, Action>(
     action$.pipe(
       ofType<Action, CreateLockSuccessAction, typeof CREATE_SUCCESS>(CREATE_SUCCESS),
-      map(({ payload: id }: CreateLockSuccessAction) => push(`${id}`))
+      mergeMap(({ payload: { lockId, username } }: CreateLockSuccessAction) => {
+        return of(push(`${lockId}`), lockInitialize(lockId, username));
+      })
     ),
     action$.pipe(
       ofType<Action, CreateLockFailureAction, typeof CREATE_FAILURE>(CREATE_FAILURE),

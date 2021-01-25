@@ -32,9 +32,10 @@ defmodule LockTheLock.Services.CreateLock do
 
   def create_lock(changeset) do
     %__MODULE__{
+      username: username,
       timeout: timeout
     } = Changeset.apply_changes(changeset)
 
-    {:ok, Locks.create_id(timeout)}
+    {:ok, Locks.create_id(timeout), username}
   end
 end

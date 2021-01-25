@@ -130,7 +130,7 @@ export type LockSubOutputMsg = LockSubOutputSubscribeSuccessMsg | LockSubOutputS
 const BASE_URL = process.env.NODE_ENV === "development" ? "ws://localhost:4000" : "";
 
 export const locks = {
-  create: (lock: NewLock): Observable<Response<NewLock, { id: LockId }>> => {
+  create: (lock: NewLock): Observable<Response<NewLock, { id: LockId; username: string; }>> => {
     return ajax({
       url: "/api/locks",
       method: "POST",
@@ -139,9 +139,9 @@ export const locks = {
       },
       body: lock
     }).pipe(
-      map<AjaxResponse, Response<NewLock, { id: LockId }>>(({ response, status }: AjaxResponse) => {
+      map<AjaxResponse, Response<NewLock, { id: LockId, username: string }>>(({ response, status }: AjaxResponse) => {
         if (status >= 200 && status < 300) {
-          return { type: SUCCESS, entity: response as { id: LockId } };
+          return { type: SUCCESS, entity: response as { id: LockId, username: string } };
         }
         else {
           return { type: ERROR, errors: response as Errors<NewLock> };
@@ -151,7 +151,7 @@ export const locks = {
         const { status, response } = error;
 
         if (status === 422) {
-          return of<Response<NewLock, { id: LockId }>>({ type: ERROR, errors: response as Errors<NewLock> });
+          return of<Response<NewLock, { id: LockId; username: string; }>>({ type: ERROR, errors: response as Errors<NewLock> });
         }
         else {
           throw error;

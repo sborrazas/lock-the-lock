@@ -34,7 +34,10 @@ export interface CreateLockAction extends Action {
 
 export interface CreateLockSuccessAction extends Action {
   type: typeof CREATE_SUCCESS;
-  payload: LockId;
+  payload: {
+    lockId: LockId;
+    username: string;
+  }
 };
 
 export interface CreateLockFailureAction extends Action {
@@ -180,10 +183,13 @@ export function createLock(newLock: NewLock): LocksActionTypes {
   };
 };
 
-export function createLockSuccess(lockId: LockId): LocksActionTypes {
+export function createLockSuccess(lockId: LockId, username: string): LocksActionTypes {
   return {
     type: CREATE_SUCCESS,
-    payload: lockId
+    payload: {
+      lockId,
+      username
+    }
   };
 };
 

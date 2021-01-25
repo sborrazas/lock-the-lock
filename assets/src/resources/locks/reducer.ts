@@ -1,4 +1,5 @@
 import {
+  LOCK_INITIALIZE,
   LOCK_SUBSCRIBE,
   LOCK_SUBSCRIBE_SUCCESS,
   LOCK_SUBSCRIBE_FAILURE,
@@ -18,6 +19,7 @@ import {
   UserId,
   User,
   LOCK_STATE_UNINITIALIZED,
+  LOCK_STATE_INITIALIZED,
   LOCK_STATE_LOADING,
   LOCK_STATE_SUCCESS,
   LOCK_STATE_FAILED
@@ -114,6 +116,14 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
 export default function (state = initialState, action: LocksActionTypes): LocksState {
   console.log("ACTION", action);
   switch (action.type) {
+    case LOCK_INITIALIZE:
+      return {
+        ...state,
+        [action.payload.lockId]: {
+          state: LOCK_STATE_INITIALIZED,
+          username: action.payload.username
+        }
+      };
     case LOCK_SUBSCRIBE:
       return {
         ...state,

@@ -176,9 +176,9 @@ class Lock extends React.Component<Props> {
         <LayoutAside>
           <Teleprompter itemsCount={logs.length}>
             {
-              logs.map(({ user: { username, number }, message }) => {
+              logs.map(({ user: { username, number }, message }, index) => {
                 return (
-                  <TeleprompterItem>
+                  <TeleprompterItem key={index}>
                     <Strong colorNumber={number}>{username}</Strong> {message}
                   </TeleprompterItem>
                 );

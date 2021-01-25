@@ -94,9 +94,9 @@ export default (action$: Observable<Action>, state: LocksState): Observable<Acti
       ofType<Action, CreateLockAction, typeof CREATE>(CREATE),
       mergeMap((item: CreateLockAction) => {
         return locks.create(item.payload).pipe(
-          map((response: Response<NewLock, { id: LockId }>) => {
+          map((response: Response<NewLock, { id: LockId, username: string }>) => {
             if (response.type === SUCCESS) {
-              return createLockSuccess(response.entity.id);
+              return createLockSuccess(response.entity.id, response.entity.username);
             }
             else {
               return createLockFailure(response.errors);

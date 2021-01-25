@@ -10,6 +10,11 @@ export type User = {
   number: number;
 };
 
+export type Log = {
+  user: User;
+  message: string;
+};
+
 export const LOCK_STATE_UNINITIALIZED = "UNINITIALIZED";
 export const LOCK_STATE_INITIALIZED = "INITIALIZED";
 export const LOCK_STATE_LOADING = "LOADING";
@@ -39,6 +44,7 @@ type LockSuccess = BaseLock & {
   lockedBy: number | null;
   lockedAt: string | null;
   timeout: number;
+  logs: Array<Log>;
 };
 
 type LockFailed = {

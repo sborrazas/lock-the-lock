@@ -26,11 +26,17 @@ import Form, {
 } from "../shared/Form";
 
 import { RootState } from "../../resources/reducer";
-import { lockSubscribe, lockUnsubscribe } from "../../resources/locks/actions";
+import {
+  lockSubscribe,
+  lockLock,
+  lockUnlock,
+  lockUnsubscribe
+} from "../../resources/locks/actions";
 import { ui, locks } from "../../resources/selectors";
 import {
   LockSettings,
   User,
+  Log,
   LOCK_STATE_UNINITIALIZED,
   LOCK_STATE_LOADING,
   LOCK_STATE_FAILED,
@@ -38,48 +44,35 @@ import {
   LOCK_STATE_SUCCESS
 } from "../../resources/locks/types";
 
+const serializeUsers = (users: Array<User>) => users.map(({ id, number, username }) => {
+  return { id, colorNumber: number, label: username };
+});
+
 const FAKE_USERS = [
-  { id: 1, colorNumber: 1, label: "aalice" },
-  { id: 2, colorNumber: 39, label: "bbob" },
-  { id: 3, colorNumber: 22, label: "mark" },
-  { id: 4, colorNumber: 54, label: "john.doe" },
-  { id: 5, colorNumber: 50, label: "pepe" },
-  { id: 6, colorNumber: 8, label: "pepe" },
-  { id: 7, colorNumber: 15, label: "pepe" }
+  { id: 1, number: 1, username: "aalice" },
+  { id: 2, number: 39, username: "bbob" },
+  { id: 3, number: 22, username: "mark" },
+  { id: 4, number: 54, username: "john.doe" },
+  { id: 5, number: 50, username: "pepe" },
+  { id: 6, number: 8, username: "pepe" },
+  { id: 7, number: 15, username: "pepe" }
 ];
+
+const SERIALIZED_FAKE_USERS = serializeUsers(FAKE_USERS);
 
 const FAKE_SELECTED_ID = 4;
 
 const DEFAULT_COLOR_NUMBER = 3;
 
-const FAKE_TELEPROMPTER_ITEMS: Array<number> = [
-      // <TeleprompterItem>
-      //   <Strong colorNumber={54}>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
-      // </TeleprompterItem>
-      // <TeleprompterItem>
-      //   <Strong>john.doe</Strong> acquired the lock
-      // </TeleprompterItem>
-      // <TeleprompterItem>
-      //   <Strong>pepe</Strong> joined the lock
-      // </TeleprompterItem>
-      // <TeleprompterItem>
-      //   <Strong>pepe</Strong> left the lock
-      // </TeleprompterItem>
-      // <TeleprompterItem>
-      //   <Strong>pepe</Strong> left the lock
-      // </TeleprompterItem>
-      // <TeleprompterItem>
-      //   <Strong>pepe</Strong> left the lock
-      // </TeleprompterItem>
-      // <TeleprompterItem>
-      //   <Strong>pepe</Strong> left the lock
-      // </TeleprompterItem>
-      // <TeleprompterItem>
-      //   <Strong>pepe</Strong> left the lock
-      // </TeleprompterItem>
-      // <TeleprompterItem>
-      //   <Strong>pepe</Strong> left the lock
-      // </TeleprompterItem>
+const FAKE_LOGS: Array<Log> = [
+  { user: FAKE_USERS[3], message: "released the lock after 5 seconds" },
+  { user: FAKE_USERS[5], message: "acquired the lock" },
+  { user: FAKE_USERS[2], message: "joined the lock" },
+  { user: FAKE_USERS[5], message: "acquired the lock" },
+  { user: FAKE_USERS[5], message: "acquired the lock" },
+  { user: FAKE_USERS[5], message: "acquired the lock" },
+  { user: FAKE_USERS[5], message: "acquired the lock" },
+  { user: FAKE_USERS[5], message: "acquired the lock" }
 ];
 
 type OwnProps = RouteComponentProps<{ lockId: string }> & {};
@@ -89,17 +82,19 @@ const connector = connect((state: RootState, { match: { params: { lockId } } }: 
     lock: locks.selectLock(state, lockId),
     lockSettingsForm: ui.selectForm(state, "lockSettings")
   };
-}, { lockSubscribe, lockUnsubscribe });
+}, { lockSubscribe, lockLock, lockUnlock, lockUnsubscribe });
 
 type Props = OwnProps & ConnectedProps<typeof connector>;
 
 const UsernameField = ConnectedField<"lockSettings", "username">();
 
-const serializeUsers = (users: Array<User>) => users.map(({ id, number, username }) => {
-  return { id, colorNumber: number, label: username };
-});
-
 class Lock extends React.Component<Props> {
+  constructor(props: Props) {
+    super(props);
+
+    this._onLock = this._onLock.bind(this);
+  }
+
   componentDidMount() {
     const { lock, lockSubscribe, match: { params: { lockId } } } = this.props;
 
@@ -126,6 +121,8 @@ class Lock extends React.Component<Props> {
     const { lock, lockSettingsForm, match: { params: { lockId } }, history, lockSubscribe } = this.props;
     let modal;
     let user;
+    let label = "Locked by john.doe";
+    let logs: Array<Log> = FAKE_LOGS;
 
     console.log("RENDERING LOCK", lock);
 
@@ -150,53 +147,59 @@ class Lock extends React.Component<Props> {
       if (userTmp) {
         user = { colorNumber: userTmp.number, username: userTmp.username };
       }
+
+      if (lock.lockedBy) {
+        const lockedByTmp = lock.users.find(({ id }) => id === lock.lockedBy);
+
+        if (lockedByTmp) {
+          label = lock.lockedBy === lock.userId ? "Unlock" : `Locked by ${lockedByTmp.username}`;
+        }
+      }
+      else {
+        label = "Lock";
+      }
+
+      logs = lock.logs;
     }
     else if (lock.state === LOCK_STATE_INITIALIZED) {
       user = { colorNumber: DEFAULT_COLOR_NUMBER, username: lock.username };
     }
 
-    const users = lock.state === LOCK_STATE_SUCCESS ? serializeUsers(lock.users) : FAKE_USERS;
-    const teleprompterItems = lock.state === LOCK_STATE_SUCCESS ? [] : FAKE_TELEPROMPTER_ITEMS;
+    const users = lock.state === LOCK_STATE_SUCCESS ? serializeUsers(lock.users) : SERIALIZED_FAKE_USERS;
     const selectedId = lock.state === LOCK_STATE_SUCCESS ? lock.lockedBy : FAKE_SELECTED_ID;
 
     return (
       <Root title={`Lock ${lockId}`} modal={modal} user={user}>
         <LayoutSection>
-          <Donut items={users} selectedId={selectedId} />
+          <Donut label={label} items={users} selectedId={selectedId} onClick={this._onLock} />
         </LayoutSection>
         <LayoutAside>
-          <Teleprompter itemsCount={3}>
-            <TeleprompterItem>
-              <Strong colorNumber={54}>john.doe</Strong> released the lock after <Strong>5 seconds</Strong>
-            </TeleprompterItem>
-            <TeleprompterItem>
-              <Strong>john.doe</Strong> acquired the lock
-            </TeleprompterItem>
-            <TeleprompterItem>
-              <Strong>pepe</Strong> joined the lock
-            </TeleprompterItem>
-            <TeleprompterItem>
-              <Strong>pepe</Strong> left the lock
-            </TeleprompterItem>
-            <TeleprompterItem>
-              <Strong>pepe</Strong> left the lock
-            </TeleprompterItem>
-            <TeleprompterItem>
-              <Strong>pepe</Strong> left the lock
-            </TeleprompterItem>
-            <TeleprompterItem>
-              <Strong>pepe</Strong> left the lock
-            </TeleprompterItem>
-            <TeleprompterItem>
-              <Strong>pepe</Strong> left the lock
-            </TeleprompterItem>
-            <TeleprompterItem>
-              <Strong>pepe</Strong> left the lock
-            </TeleprompterItem>
+          <Teleprompter itemsCount={logs.length}>
+            {
+              logs.map(({ user: { username, number }, message }) => {
+                return (
+                  <TeleprompterItem>
+                    <Strong colorNumber={number}>{username}</Strong> {message}
+                  </TeleprompterItem>
+                );
+              })
+            }
           </Teleprompter>
         </LayoutAside>
       </Root>
     );
+  }
+  _onLock() {
+    const { lock, match: { params: { lockId } }, lockLock, lockUnlock } = this.props;
+
+    if (lock.state === LOCK_STATE_SUCCESS) {
+      if (lock.lockedBy) {
+        lockUnlock(lockId);
+      }
+      else {
+        lockLock(lockId);
+      }
+    }
   }
 };
 

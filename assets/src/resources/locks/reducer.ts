@@ -15,6 +15,8 @@ import {
 import {
   Lock,
   LockId,
+  UserId,
+  User,
   LOCK_STATE_UNINITIALIZED,
   LOCK_STATE_LOADING,
   LOCK_STATE_SUCCESS,
@@ -25,6 +27,12 @@ export type LocksState = Record<LockId, Lock>;
 
 const initialState: LocksState = {};
 
+const findUsername = (userId: UserId, users: Array<User>): User => {
+  const user = users.find(({ id }) => id === userId);
+
+  return user || { id: -1, username: "Unknown", number: 0 };
+};
+
 const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
   if (state.state === LOCK_STATE_SUCCESS) {
     switch (action.type) {
@@ -32,18 +40,39 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
         return {
           ...state,
           lockedBy: action.payload.lockedBy,
-          lockedAt: action.payload.lockedAt
+          lockedAt: action.payload.lockedAt,
+          logs: [
+            {
+              user: findUsername(action.payload.lockedBy, state.users),
+              message: "acquired the lock"
+            },
+            ...state.logs
+          ]
         };
       case LOCK_UNLOCKED:
         return {
           ...state,
           lockedBy: null,
-          lockedAt: null
+          lockedAt: null,
+          logs: [
+            {
+              user: findUsername(state.lockedBy || 0, state.users),
+              message: "released the lock after 5 seconds"
+            },
+            ...state.logs
+          ]
         };
       case LOCK_TIMEOUT_UPDATED:
         return {
           ...state,
-          timeout: action.payload.timeout
+          timeout: action.payload.timeout,
+          logs: [
+            {
+              user: findUsername(action.payload.userId, state.users),
+              message: `updated the timeout to ${action.payload.timeout}`
+            },
+            ...state.logs
+          ]
         }
       case LOCK_USER_ADDED:
         const usersAddedUsers = state.users.slice(0);
@@ -52,12 +81,26 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
 
         return {
           ...state,
-          users: usersAddedUsers
+          users: usersAddedUsers,
+          logs: [
+            {
+              user: action.payload,
+              message: "joined the lock"
+            },
+            ...state.logs
+          ]
         }
       case LOCK_USER_REMOVED:
         return {
           ...state,
-          users: state.users.filter(({ id }) => id === action.payload.id)
+          users: state.users.filter(({ id }) => id !== action.payload.id),
+          logs: [
+            {
+              user: findUsername(action.payload.id, state.users),
+              message: "left the lock"
+            },
+            ...state.logs
+          ]
         }
       default:
         return state;
@@ -87,7 +130,13 @@ export default function (state = initialState, action: LocksActionTypes): LocksS
           users: action.payload.users,
           userId: action.payload.userId,
           lockedBy: action.payload.lockedBy,
-          lockedAt: action.payload.lockedAt
+          lockedAt: action.payload.lockedAt,
+          logs: [
+            {
+              user: findUsername(action.payload.userId, action.payload.users),
+              message: "joined the lock"
+            }
+          ]
         }
       };
     case LOCK_SUBSCRIBE_FAILURE:

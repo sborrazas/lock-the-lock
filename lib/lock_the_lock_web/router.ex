@@ -15,4 +15,8 @@ defmodule LockTheLockWeb.Router do
 
     resources "/locks", LockController, only: [:create]
   end
+
+  scope "/", LockTheLockWeb do
+    get("/:lock_id", PageController, :index)
+  end
 end

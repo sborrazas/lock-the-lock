@@ -209,6 +209,10 @@ export const locks = {
           });
         });
 
+      channel.onError(({ reason }) => {
+        // console.log("CHANNEL ERROR", reason);
+      });
+
       channel
         .join()
         .receive("ok", ({ user_id, users, locked_by, locked_at, timeout }) => {
@@ -254,8 +258,6 @@ export const locks = {
           socket.disconnect();
         })
         .receive("timeout", () => {
-          console.log("CHANNEL JOIN TIMEOUT");
-
           subject.next({
             type: LOCK_SUB_OUTPUT_CRITICALLY_FAILED,
             error: "Timeout"
@@ -263,16 +265,10 @@ export const locks = {
         });
 
       socket.onError((reason) => {
-        console.log("SOCKET ERROR", reason);
-
         subject.next({
           type: LOCK_SUB_OUTPUT_CRITICALLY_FAILED,
           error: reason
         });
-      });
-
-      socket.onClose(() => {
-        console.log("ON CLOSE");
       });
 
       socket.connect();

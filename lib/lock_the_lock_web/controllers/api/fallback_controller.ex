@@ -6,7 +6,6 @@ defmodule LockTheLockWeb.API.FallbackController do
   use LockTheLockWeb, :controller
 
   alias Ecto.Changeset
-  alias LockTheLockWeb.API.ChangesetView
 
   def call(conn, {:error, changeset}) do
     errors =

@@ -119,7 +119,7 @@ defmodule LockTheLock.Locks.Lock do
     {:reply, {:ok, locked_at}, %State{state | locked_by: user_id, locked_at: locked_at}}
   end
 
-  def handle_call({:acquire_lock, user_id}, _from, state) do
+  def handle_call({:acquire_lock, _user_id}, _from, state) do
     {:reply, :already_locked, state}
   end
 
@@ -140,7 +140,7 @@ defmodule LockTheLock.Locks.Lock do
   end
 
   @impl true
-  def handle_cast({:exit_lock, user_id}, %State{users: users, locked_by: locked_by} = state) do
+  def handle_cast({:exit_lock, user_id}, %State{users: users} = state) do
     case Enum.reject(users, fn {id, _username, _number} -> id == user_id end) do
       [] -> # No users left
         {:stop, :normal, %State{state | users: []}}

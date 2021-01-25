@@ -2,6 +2,8 @@
 
 .Layout {
   bottom: 0;
+  display: flex;
+  flex-flow: row wrap;
   left: 0;
   overflow-y: auto;
   position: absolute;
@@ -12,8 +14,6 @@
 
 .Layout--landing {
   align-items: center;
-  display: flex;
-  flex-flow: row wrap;
   justify-content: center;
 }
 
@@ -97,4 +97,20 @@
   flex: 1 1;
   margin: 20px;
   max-width: 400px;
+}
+
+@media (max-width: 641px) {
+  /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+  .Layout-innerBody {
+    display: initial;
+  }
+  .Layout-footer {
+    margin-top: 20px;
+  }
+}
+@media (max-width: 481px) {
+  /* portrait e-readers (Nook/Kindle), smaller tablets @ 600 or @ 640 wide. */
+}
+@media (max-width: 320px) {
+  /* smartphones, iPhone, portrait 480x320 phones */
 }

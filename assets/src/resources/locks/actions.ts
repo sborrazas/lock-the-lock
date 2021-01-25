@@ -252,6 +252,24 @@ export function lockUnsubscribe(lockId: LockId): LocksActionTypes {
   };
 };
 
+export function lockLock(lockId: LockId): LocksActionTypes {
+  return {
+    type: LOCK_LOCK,
+    payload: {
+      lockId
+    }
+  };
+};
+
+export function lockUnlock(lockId: LockId): LocksActionTypes {
+  return {
+    type: LOCK_UNLOCK,
+    payload: {
+      lockId
+    }
+  };
+};
+
 export function lockLocked(lockId: LockId, lockedBy: number, lockedAt: string): LocksActionTypes {
   return {
     type: LOCK_LOCKED,

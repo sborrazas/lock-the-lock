@@ -44,7 +44,7 @@ defmodule LockTheLockWeb.LockChannel do
 
         {:noreply, socket}
       :already_locked ->
-        {:reply, {:error, "already_locked"}}
+        {:reply, {:error, %{reason: "already_locked"}}, socket}
     end
   end
 
@@ -57,7 +57,7 @@ defmodule LockTheLockWeb.LockChannel do
 
         {:noreply, socket}
       :not_locked ->
-        {:reply, {:error, "not_locked"}}
+        {:reply, {:error, %{reason: "not_locked"}}, socket}
     end
   end
 
@@ -82,8 +82,6 @@ defmodule LockTheLockWeb.LockChannel do
     lock_handle = assigns.lock_handle
 
     Locks.exit_lock(lock_handle)
-
-    broadcast!(socket, "user_removed", %{user_id: Lock.user_id(lock_handle)})
 
     {:stop, :left, socket}
   end
@@ -114,10 +112,6 @@ defmodule LockTheLockWeb.LockChannel do
     broadcast!(socket, "user_added", %{id: user_id, username: username, number: number})
 
     {:noreply, socket}
-  end
-
-  def terminate({:shutdown, :left}, socket) do
-    IO.inspect(["left", socket.assigns.lock_handle])
   end
 
   def terminate({:shutdown, :closed}, %Socket{assigns: assigns} = socket) do

@@ -26,7 +26,7 @@ defmodule LockTheLock.Locks.Lock do
                                             {:error, :username_taken}
   def join(lock_id, username, timeout) do
     lock =
-      case GenServer.start_link(__MODULE__, timeout, [name: {:global, lock_id}])  do
+      case GenServer.start(__MODULE__, timeout, [name: {:global, lock_id}])  do
         {:ok, pid} ->
           # TODO: Attach to supervisor
           pid
@@ -102,13 +102,14 @@ defmodule LockTheLock.Locks.Lock do
       {:reply, {:error, :username_taken}, state}
     else
       number = find_available_number(users)
+      new_counter = counter + 1
       new_state = %State{
         state |
-        counter: counter + 1,
-        users: [{counter, username, number} | users]
+        counter: new_counter,
+        users: [{new_counter, username, number} | users]
       }
 
-      {:reply, {:ok, counter, extract_data(new_state)}, new_state}
+      {:reply, {:ok, new_counter, extract_data(new_state)}, new_state}
     end
   end
 
@@ -116,6 +117,18 @@ defmodule LockTheLock.Locks.Lock do
     locked_at = DateTime.utc_now()
 
     {:reply, {:ok, locked_at}, %State{state | locked_by: user_id, locked_at: locked_at}}
+  end
+
+  def handle_call({:acquire_lock, user_id}, _from, state) do
+    {:reply, :already_locked, state}
+  end
+
+  def handle_call({:release_lock, user_id}, _from, %State{locked_by: user_id} = state) do
+    {:reply, :ok, %State{state | locked_by: nil, locked_at: nil}}
+  end
+
+  def handle_call({:release_lock, _user_id}, _from, state) do
+    {:reply, :not_locked, state}
   end
 
   def handle_call({:update_timeout, timeout}, _from, %State{locked_by: nil} = state) do
@@ -127,14 +140,16 @@ defmodule LockTheLock.Locks.Lock do
   end
 
   @impl true
-  def handle_cast({:exit_lock, user_id}, %State{users: users} = state) do
-    new_users = Enum.reject(users, fn {id, _username, _number} -> id == user_id end)
-
-    {:noreply, %State{state | users: new_users}}
+  def handle_cast({:exit_lock, user_id}, %State{users: users, locked_by: locked_by} = state) do
+    case Enum.reject(users, fn {id, _username, _number} -> id == user_id end) do
+      [] -> # No users left
+        {:stop, :normal, %State{state | users: []}}
+      new_users ->
+        {:noreply, %State{state | users: new_users}}
+    end
   end
 
   defp extract_data(state) do
-    IO.inspect(state)
     state
     |> Map.take([:timeout, :users, :locked_by, :locked_at])
     |> Map.update!(:users, fn users ->

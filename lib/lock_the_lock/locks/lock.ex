@@ -4,6 +4,9 @@ defmodule LockTheLock.Locks.Lock do
 
   use GenServer
 
+  alias Phoenix.PubSub
+  alias LockTheLock.PubSub, as: LockTheLockPubSub
+
   @type id :: String.t()
   @type lock :: pid()
   @type lock_timeout :: non_neg_integer()
@@ -26,7 +29,7 @@ defmodule LockTheLock.Locks.Lock do
                                             {:error, :username_taken}
   def join(lock_id, username, timeout) do
     lock =
-      case GenServer.start(__MODULE__, timeout, [name: {:global, lock_id}])  do
+      case GenServer.start(__MODULE__, {lock_id, timeout}, [name: {:global, lock_id}])  do
         {:ok, pid} ->
           # TODO: Attach to supervisor
           pid
@@ -62,11 +65,12 @@ defmodule LockTheLock.Locks.Lock do
   # GenServer Callbacks
   defmodule LockTheLock.Locks.Lock.State do
 
-    defstruct [:counter, :timeout, :users, :locked_by, :locked_at, :timer]
+    defstruct [:lock_id, :counter, :timeout, :users, :locked_by, :locked_at, :timer]
 
     alias LockTheLock.Locks.Lock
 
     @type t :: %__MODULE__{
+      lock_id: Lock.id(),
       counter: non_neg_integer(),
       timeout: Lock.timeout(),
       users: [{Lock.user_id(), Lock.username(), Lock.lnumber()}],
@@ -79,8 +83,9 @@ defmodule LockTheLock.Locks.Lock do
   alias LockTheLock.Locks.Lock.State
 
   @impl true
-  def init(timeout) do
-    {:ok, %State{counter: 0,
+  def init({lock_id, timeout}) do
+    {:ok, %State{lock_id: lock_id,
+                 counter: 0,
                  timeout: timeout,
                  users: [],
                  locked_by: nil,
@@ -113,22 +118,35 @@ defmodule LockTheLock.Locks.Lock do
     end
   end
 
-  def handle_call({:acquire_lock, user_id}, _from, %State{locked_by: nil} = state) do
+  def handle_call({:acquire_lock, user_id}, _from, %State{locked_by: nil, timeout: 0} = state) do
     locked_at = DateTime.utc_now()
 
     {:reply, {:ok, locked_at}, %State{state | locked_by: user_id, locked_at: locked_at}}
+  end
+
+  def handle_call({:acquire_lock, user_id}, _from, %State{locked_by: nil, timeout: timeout} = state) do
+    locked_at = DateTime.utc_now()
+    tref = :timer.send_after(timeout * 1_000, :lock_timeout)
+
+    {:reply, {:ok, locked_at}, %State{state | locked_by: user_id, locked_at: locked_at, timer: tref}}
   end
 
   def handle_call({:acquire_lock, _user_id}, _from, state) do
     {:reply, :already_locked, state}
   end
 
-  def handle_call({:release_lock, user_id}, _from, %State{locked_by: user_id} = state) do
+  def handle_call({:release_lock, _user_id}, _from, %State{locked_by: nil} = state) do
+    {:reply, :not_locked, state}
+  end
+
+  def handle_call({:release_lock, user_id}, _from, %State{timer: nil, locked_by: user_id} = state) do
     {:reply, :ok, %State{state | locked_by: nil, locked_at: nil}}
   end
 
-  def handle_call({:release_lock, _user_id}, _from, state) do
-    {:reply, :not_locked, state}
+  def handle_call({:release_lock, user_id}, _from, %State{timer: tref, locked_by: user_id} = state) do
+    :timer.cancel(tref)
+
+    {:reply, :ok, %State{state | locked_by: nil, locked_at: nil}}
   end
 
   def handle_call({:update_timeout, timeout}, _from, %State{locked_by: nil} = state) do
@@ -147,6 +165,17 @@ defmodule LockTheLock.Locks.Lock do
       new_users ->
         {:noreply, %State{state | users: new_users}}
     end
+  end
+
+  @impl true
+  def handle_info(:lock_timeout, %State{locked_by: nil} = state) do
+    {:noreply, state}
+  end
+
+  def handle_info(:lock_timeout, %State{lock_id: lock_id} = state) do
+    PubSub.broadcast(LockTheLockPubSub, "locks_internal:#{lock_id}", :lock_timeout)
+
+    {:noreply, %State{state | timer: nil, locked_by: nil, locked_at: nil}}
   end
 
   defp extract_data(state) do

@@ -10,6 +10,7 @@ import {
   LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED,
   LOCK_SUB_OUTPUT_LOCKED,
   LOCK_SUB_OUTPUT_UNLOCKED,
+  LOCK_SUB_OUTPUT_TIMEDOUT,
   LOCK_SUB_OUTPUT_USER_ADDED,
   LOCK_SUB_OUTPUT_USER_REMOVED,
   LOCK_SUB_OUTPUT_TIMEOUT_UPDATED,
@@ -43,6 +44,7 @@ import {
   lockSubscribeFailure,
   lockLocked,
   lockUnlocked,
+  lockTimedout,
   lockUserAdded,
   lockUserRemoved,
   lockTimeoutUpdated,
@@ -131,6 +133,8 @@ export default (action$: Observable<Action>, state: LocksState): Observable<Acti
                 return lockLocked(lockId, msg.lockedBy, msg.lockedAt);
               case LOCK_SUB_OUTPUT_UNLOCKED:
                 return lockUnlocked(lockId);
+              case LOCK_SUB_OUTPUT_TIMEDOUT:
+                return lockTimedout(lockId);
               case LOCK_SUB_OUTPUT_TIMEOUT_UPDATED:
                 return lockTimeoutUpdated(
                   lockId,

@@ -64,6 +64,7 @@ export const LOCK_SUB_OUTPUT_SUBSCRIBE_SUCCESS = "LOCK_SUB_OUTPUT_SUBSCRIBE_SUCC
 export const LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED = "LOCK_SUB_OUTPUT_SUBSCRIBE_FAILED";
 export const LOCK_SUB_OUTPUT_LOCKED = "LOCK_SUB_OUTPUT_LOCKED";
 export const LOCK_SUB_OUTPUT_UNLOCKED = "LOCK_SUB_OUTPUT_UNLOCKED";
+export const LOCK_SUB_OUTPUT_TIMEDOUT = "LOCK_SUB_OUTPUT_TIMEDOUT";
 export const LOCK_SUB_OUTPUT_USER_ADDED = "LOCK_SUB_OUTPUT_USER_ADDED";
 export const LOCK_SUB_OUTPUT_USER_REMOVED = "LOCK_SUB_OUTPUT_USER_REMOVED";
 export const LOCK_SUB_OUTPUT_TIMEOUT_UPDATED = "LOCK_SUB_OUTPUT_TIMEOUT_UPDATED";
@@ -92,6 +93,10 @@ type LockSubOutputLockedMsg = {
 
 type LockSubOutputUnlockedMsg = {
   type: typeof LOCK_SUB_OUTPUT_UNLOCKED;
+};
+
+type LockSubOutputTimedoutMsg = {
+  type: typeof LOCK_SUB_OUTPUT_TIMEDOUT;
 };
 
 type LockSubOutputUserAddedMsg = {
@@ -123,8 +128,8 @@ type LockSubOutputCriticallyFailedMsg = {
 };
 
 export type LockSubOutputMsg = LockSubOutputSubscribeSuccessMsg | LockSubOutputSubscribeFailed |
-  LockSubOutputLockedMsg | LockSubOutputUnlockedMsg | LockSubOutputTimeoutUpdatedMsg |
-  LockSubOutputUserAddedMsg | LockSubOutputUserRemovedMsg |
+  LockSubOutputLockedMsg | LockSubOutputUnlockedMsg | LockSubOutputTimedoutMsg |
+  LockSubOutputTimeoutUpdatedMsg | LockSubOutputUserAddedMsg | LockSubOutputUserRemovedMsg |
   LockSubOutputFailedMsg | LockSubOutputCriticallyFailedMsg;
 
 const BASE_URL = process.env.NODE_ENV === "development" ? "ws://localhost:4000" : "";
@@ -179,6 +184,13 @@ export const locks = {
         .on("lock_unlocked", () => {
           subject.next({
             type: LOCK_SUB_OUTPUT_UNLOCKED
+          });
+        });
+
+      channel
+        .on("lock_timedout", () => {
+          subject.next({
+            type: LOCK_SUB_OUTPUT_TIMEDOUT
           });
         });
 

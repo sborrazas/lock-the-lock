@@ -7,6 +7,7 @@ import {
   LOCK_UNLOCK,
   LOCK_LOCKED,
   LOCK_UNLOCKED,
+  LOCK_TIMEDOUT,
   LOCK_USER_ADDED,
   LOCK_USER_REMOVED,
   LOCK_TIMEOUT_UPDATED,
@@ -60,6 +61,19 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
             {
               user: findUsername(state.lockedBy || 0, state.users),
               message: "released the lock after 5 seconds"
+            },
+            ...state.logs
+          ]
+        };
+      case LOCK_TIMEDOUT:
+        return {
+          ...state,
+          lockedBy: null,
+          lockedAt: null,
+          logs: [
+            {
+              user: findUsername(state.lockedBy || 0, state.users),
+              message: "'s lock timedout the lock after 5 seconds"
             },
             ...state.logs
           ]
@@ -176,6 +190,11 @@ export default function (state = initialState, action: LocksActionTypes): LocksS
         [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)
       };
     case LOCK_UNLOCKED:
+      return {
+        ...state,
+        [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)
+      };
+    case LOCK_TIMEDOUT:
       return {
         ...state,
         [action.payload.lockId]: lockReducer(state[action.payload.lockId], action)

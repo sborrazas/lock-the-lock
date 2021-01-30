@@ -4,7 +4,9 @@ defmodule LockTheLockWeb.LockChannel do
   alias Ecto.Changeset
   alias LockTheLock.Locks
   alias LockTheLock.Locks.Lock
+  alias LockTheLock.PubSub, as: LockTheLockPubSub
   alias LockTheLock.Services.JoinLock
+  alias Phoenix.PubSub
   alias Phoenix.Socket
 
   intercept ["user_added"]
@@ -14,6 +16,8 @@ defmodule LockTheLockWeb.LockChannel do
       {:ok, lock_handle, lock_data} ->
         socket = assign(socket, :lock_handle, lock_handle)
         user_id = Lock.user_id(lock_handle)
+
+        :ok = PubSub.subscribe(LockTheLockPubSub, "locks_internal:#{lock_id}")
 
         send(self(), {:after_join, user_id, lock_data})
 
@@ -114,11 +118,19 @@ defmodule LockTheLockWeb.LockChannel do
     {:noreply, socket}
   end
 
-  def terminate({:shutdown, :closed}, %Socket{assigns: assigns} = socket) do
-    lock_handle = assigns.lock_handle
+  def handle_info(:lock_timeout, socket) do
+    push(socket, "lock_timedout", %{})
 
+    {:noreply, socket}
+  end
+
+  def terminate(_reason, %Socket{assigns: %{lock_handle: lock_handle}} = socket) do
     Locks.exit_lock(lock_handle)
 
     broadcast!(socket, "user_removed", %{id: Lock.user_id(lock_handle)})
+  end
+
+  def terminate(_reason, _socket) do
+    :ok
   end
 end

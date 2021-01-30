@@ -19,6 +19,7 @@ export const LOCK_UPDATE_TIMEOUT = "LOCKS__LOCK_UPDATE_TIMEOUT";
 
 export const LOCK_LOCKED = "LOCKS__LOCK_LOCKED";
 export const LOCK_UNLOCKED = "LOCKS__LOCK_UNLOCKED";
+export const LOCK_TIMEDOUT = "LOCKS__LOCK_TIMEDOUT";
 export const LOCK_USER_ADDED = "LOCKS__LOCK_USER_ADDED";
 export const LOCK_USER_REMOVED = "LOCKS__LOCK_USER_REMOVED";
 export const LOCK_TIMEOUT_UPDATED = "LOCKS__LOCK_TIMEOUT_UPDATED";
@@ -126,6 +127,13 @@ export interface LockUnlockedAction extends Action {
   };
 };
 
+export interface LockTimedoutAction extends Action {
+  type: typeof LOCK_TIMEDOUT;
+  payload: {
+    lockId: LockId;
+  };
+};
+
 export interface LockUserAddedAction extends Action {
   type: typeof LOCK_USER_ADDED;
   payload: {
@@ -173,8 +181,9 @@ export type LocksActionTypes = CreateLockAction | CreateLockSuccessAction | Crea
     LockInitializeAction | LockSubscribeAction | LockSubscribeSuccessAction |
     LockSubscribeFailureAction | LockUnsubscribeAction |
     LockLockAction | LockUnlockAction | LockUpdateTimeoutAction | // Sub input
-    LockLockedAction | LockUnlockedAction | LockTimeoutUpdatedAction | LockFailedAction | // Sub output..
-    LockUserAddedAction | LockUserRemovedAction | LockCriticallyFailedAction; // Sub output
+    LockLockedAction | LockUnlockedAction | LockTimedoutAction | // Sub output..
+    LockTimeoutUpdatedAction | LockFailedAction | LockUserAddedAction | // Sub output..
+    LockUserRemovedAction | LockCriticallyFailedAction; // Sub output
 
 export function createLock(newLock: NewLock): LocksActionTypes {
   return {
@@ -290,6 +299,15 @@ export function lockLocked(lockId: LockId, lockedBy: number, lockedAt: string): 
 export function lockUnlocked(lockId: LockId): LocksActionTypes {
   return {
     type: LOCK_UNLOCKED,
+    payload: {
+      lockId
+    }
+  };
+};
+
+export function lockTimedout(lockId: LockId): LocksActionTypes {
+  return {
+    type: LOCK_TIMEDOUT,
     payload: {
       lockId
     }

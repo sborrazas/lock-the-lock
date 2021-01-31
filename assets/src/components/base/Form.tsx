@@ -237,7 +237,7 @@ const Field = (props: FieldProps) => {
             <ul className="Form-fieldErrors">
               {
                 errors.map((err, index) => {
-                  return (<li key={index}>Err</li>);
+                  return (<li key={index}>{err.message}</li>);
                 })
               }
             </ul>
@@ -258,7 +258,6 @@ const Nav = ({ children }: NavProps) => {
     </nav>
   );
 };
-
 
 export { Field, Nav };
 export default Form;

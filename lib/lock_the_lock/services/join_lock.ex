@@ -34,8 +34,8 @@ defmodule LockTheLock.Services.JoinLock do
 
     case Locks.join(lock_id, username) do
       {:ok, lock_handle, lock_data} -> {:ok, lock_handle, lock_data}
-      {:error, :too_many_users} -> {:error, Changeset.add_error(changeset, :base, "too_many_users")}
-      {:error, :username_taken} -> {:error, Changeset.add_error(changeset, :username, "unique")}
+      {:error, :too_many_users} -> {:error, Changeset.add_error(changeset, :base, "too many users in this lock already", [validation: :too_many_users])}
+      {:error, :username_taken} -> {:error, Changeset.add_error(changeset, :username, "must be unique", [validation: :unique])}
       {:error, :not_found} -> {:error, :not_found}
     end
   end

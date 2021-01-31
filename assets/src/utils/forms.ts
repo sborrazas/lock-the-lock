@@ -1,8 +1,16 @@
 type PresenceError = {
-  type: "presence"
+  type: "presence",
 };
 
-export type FError = PresenceError;
+type UniqueError = {
+  type: "unique";
+};
+
+type LengthError = {
+  type: "length";
+};
+
+export type FError = (PresenceError | UniqueError | LengthError) & { message: string; };
 
 export type Errors<T> = {
   [P in keyof T]?: Array<FError>;

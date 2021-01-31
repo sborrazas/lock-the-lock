@@ -1,3 +1,5 @@
+@import "./variables";
+
 @mixin hidden {
   position: absolute;
   overflow: hidden;
@@ -15,63 +17,9 @@
 }
 
 @mixin custom-colors($className, $property) {
-  .#{$className}--color1 { #{$property}: #ECE80F }
-  .#{$className}--color2 { #{$property}: #FFF200 }
-  .#{$className}--color3 { #{$property}: #FFDE00 }
-  .#{$className}--color4 { #{$property}: #FFCB08 }
-  .#{$className}--color5 { #{$property}: #FDB814 }
-  .#{$className}--color6 { #{$property}: #FAA61A }
-  .#{$className}--color7 { #{$property}: #F7941E }
-  .#{$className}--color8 { #{$property}: #F58220 }
-  .#{$className}--color9 { #{$property}: #F36F21 }
-  .#{$className}--color10 { #{$property}: #F15922 }
-  .#{$className}--color11 { #{$property}: #EF3F23 }
-  .#{$className}--color12 { #{$property}: #ED1C23 }
-  .#{$className}--color13 { #{$property}: #ED1A2E }
-  .#{$className}--color14 { #{$property}: #ED1A3B }
-  .#{$className}--color15 { #{$property}: #ED1846 }
-  .#{$className}--color16 { #{$property}: #ED1651 }
-  .#{$className}--color17 { #{$property}: #ED145B }
-  .#{$className}--color18 { #{$property}: #ED1165 }
-  .#{$className}--color19 { #{$property}: #ED0D6E }
-  .#{$className}--color20 { #{$property}: #ED0677 }
-  .#{$className}--color21 { #{$property}: #ED0281 }
-  .#{$className}--color22 { #{$property}: #EC008C }
-  .#{$className}--color23 { #{$property}: #D80D8C }
-  .#{$className}--color24 { #{$property}: #C6168D }
-  .#{$className}--color25 { #{$property}: #B41D8D }
-  .#{$className}--color26 { #{$property}: #A3238E }
-  .#{$className}--color27 { #{$property}: #92278F }
-  .#{$className}--color28 { #{$property}: #812A90 }
-  .#{$className}--color29 { #{$property}: #702C91 }
-  .#{$className}--color30 { #{$property}: #5C2E91 }
-  .#{$className}--color31 { #{$property}: #462E91 }
-  .#{$className}--color32 { #{$property}: #2E3192 }
-  .#{$className}--color33 { #{$property}: #213F9A }
-  .#{$className}--color34 { #{$property}: #0D4DA2 }
-  .#{$className}--color35 { #{$property}: #005AAB }
-  .#{$className}--color36 { #{$property}: #0066B3 }
-  .#{$className}--color37 { #{$property}: #0072BC }
-  .#{$className}--color38 { #{$property}: #007DC6 }
-  .#{$className}--color39 { #{$property}: #0089D0 }
-  .#{$className}--color40 { #{$property}: #0095DA }
-  .#{$className}--color41 { #{$property}: #00AEEF }
-  .#{$className}--color42 { #{$property}: #00ACDC }
-  .#{$className}--color43 { #{$property}: #00ABCD }
-  .#{$className}--color44 { #{$property}: #00ABBD }
-  .#{$className}--color45 { #{$property}: #00AAAD }
-  .#{$className}--color46 { #{$property}: #00A99D }
-  .#{$className}--color47 { #{$property}: #00A88E }
-  .#{$className}--color48 { #{$property}: #00A77E }
-  .#{$className}--color49 { #{$property}: #00A76D }
-  .#{$className}--color50 { #{$property}: #00A65E }
-  .#{$className}--color51 { #{$property}: #00A651 }
-  .#{$className}--color52 { #{$property}: #00AB4E }
-  .#{$className}--color53 { #{$property}: #22B24C }
-  .#{$className}--color54 { #{$property}: #4DB848 }
-  .#{$className}--color55 { #{$property}: #71BF44 }
-  .#{$className}--color56 { #{$property}: #8CC63F }
-  .#{$className}--color57 { #{$property}: #A6CE39 }
-  .#{$className}--color58 { #{$property}: #BED62E }
-  .#{$className}--color59 { #{$property}: #D7DF21 }
+  @each $color in $lockColors {
+    .#{$className}--color#{index($lockColors, $color)} {
+      #{$property}: $color;
+    }
+  }
 }

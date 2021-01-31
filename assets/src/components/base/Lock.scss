@@ -50,8 +50,13 @@
 
 @include custom-colors("Lock-bottomPath", "fill");
 
-.Lock-content {
+.Lock-nav {
+  margin-bottom: 10px;
   text-align: center;
+}
+
+.Lock-navItem {
+  margin: 0 10px;
 }
 
 .Lock-label {
@@ -66,7 +71,17 @@
   text-transform: uppercase;
 }
 
+.Lock-share {
+  background: $Lock-label--backgroundColor;
+  border: 3px solid $Lock-label--borderColor;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-block;
+  padding: 10px;
+}
+
 .Lock-users {
+  text-align: center;
 }
 
 .Lock-usersUser {

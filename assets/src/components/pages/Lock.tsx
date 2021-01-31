@@ -171,7 +171,12 @@ class Lock extends React.Component<Props> {
     return (
       <Root title={`Lock ${lockId}`} modal={modal} user={user}>
         <LayoutSection>
-          <UiLock label={label} items={users} selectedId={selectedId} onClick={this._onLock} />
+          <UiLock
+            label={label}
+            lockUrl={window.location.href}
+            items={users}
+            selectedId={selectedId}
+            onClick={this._onLock} />
         </LayoutSection>
         <LayoutAside>
           <Teleprompter itemsCount={logs.length}>

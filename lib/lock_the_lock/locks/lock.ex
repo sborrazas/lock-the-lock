@@ -149,6 +149,10 @@ defmodule LockTheLock.Locks.Lock do
     {:reply, :ok, %State{state | timer: nil, locked_by: nil, locked_at: nil}}
   end
 
+  def handle_call({:release_lock, user_id}, _from, state) do
+    {:reply, :not_locked, state}
+  end
+
   def handle_call({:update_timeout, timeout}, _from, %State{locked_by: nil} = state) do
     {:reply, :ok, %State{state | timeout: timeout}}
   end

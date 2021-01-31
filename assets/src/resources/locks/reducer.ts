@@ -13,7 +13,6 @@ import {
   LOCK_TIMEOUT_UPDATED,
   LocksActionTypes
 } from "./actions";
-
 import {
   Lock,
   LockId,
@@ -25,6 +24,7 @@ import {
   LOCK_STATE_SUCCESS,
   LOCK_STATE_FAILED
 } from "./types";
+import { diffWithNow, prettyFormat } from "../../utils/dates";
 
 export type LocksState = Record<LockId, Lock>;
 
@@ -60,7 +60,7 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
           logs: [
             {
               user: findUsername(state.lockedBy || 0, state.users),
-              message: "released the lock after 5 seconds"
+              message: `released the lock ${prettyFormat(diffWithNow(state.lockedAt || ""))}`
             },
             ...state.logs
           ]
@@ -73,7 +73,7 @@ const lockReducer = (state: Lock, action: LocksActionTypes): Lock => {
           logs: [
             {
               user: findUsername(state.lockedBy || 0, state.users),
-              message: "'s lock timedout the lock after 5 seconds"
+              message: `'s lock timedout ${prettyFormat(state.timeout)}`
             },
             ...state.logs
           ]

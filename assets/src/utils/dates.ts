@@ -12,3 +12,15 @@ export const format = (seconds: number): string => {
     seconds % 60
   ].map(n => n < 10 ? `0${n}` : `${n}`).join(":");
 };
+
+export const prettyFormat = (elapsed: number): string => {
+  if (elapsed === 0) {
+    return "immediately";
+  }
+  else if (elapsed < 60) {
+    return `after ${elapsed} seconds`;
+  }
+  else {
+    return `after ${Math.round(elapsed / 60)} minutes`;
+  }
+};

@@ -43,6 +43,7 @@ import {
   LOCK_STATE_INITIALIZED,
   LOCK_STATE_SUCCESS
 } from "../../resources/locks/types";
+import { diffWithNow } from "../../utils/dates";
 
 const serializeUsers = (users: Array<User>) => users.map(({ id, number, username }) => {
   return { id, colorNumber: number, label: username };
@@ -90,11 +91,20 @@ type Props = OwnProps & ConnectedProps<typeof connector>;
 
 const UsernameField = ConnectedField<"lockSettings", "username">();
 
-class Lock extends React.Component<Props> {
+type LockState = {
+  interval: ReturnType<typeof setInterval> | null;
+  secondsLeft: number | null;
+};
+
+class Lock extends React.Component<Props, LockState> {
   constructor(props: Props) {
     super(props);
 
     this._onLock = this._onLock.bind(this);
+    this.state = {
+      secondsLeft: null,
+      interval: setInterval(this._updateSecondsLeft.bind(this), 500)
+    };
   }
 
   componentDidMount() {
@@ -107,8 +117,14 @@ class Lock extends React.Component<Props> {
 
   componentWillUnmount() {
     const { lockUnsubscribe, match: { params: { lockId } } } = this.props;
+    const { interval } = this.state;
 
+    if (interval) {
+      clearInterval(interval);
+    }
     lockUnsubscribe(lockId);
+
+    this.setState({ interval: null });
   }
 
   componentDidUpdate() {
@@ -125,6 +141,7 @@ class Lock extends React.Component<Props> {
     let user;
     let label = "Locked by john";
     let logs: Array<Log> = FAKE_LOGS;
+    const { secondsLeft } = this.state;
 
     if (lock.state === LOCK_STATE_LOADING ||
         lock.state === LOCK_STATE_UNINITIALIZED ||
@@ -172,6 +189,7 @@ class Lock extends React.Component<Props> {
       <Root title={`Lock ${lockId}`} modal={modal} user={user}>
         <LayoutSection>
           <UiLock
+            secondsLeft={secondsLeft}
             label={label}
             lockUrl={window.location.href}
             items={users}
@@ -203,6 +221,19 @@ class Lock extends React.Component<Props> {
       }
       else {
         lockLock(lockId);
+      }
+    }
+  }
+  _updateSecondsLeft() {
+    const { lock } = this.props;
+    const { interval, secondsLeft } = this.state;
+
+    if (interval && lock.state === LOCK_STATE_SUCCESS && lock.timeout > 0) {
+      if (lock.lockedAt) {
+        this.setState({ secondsLeft: lock.timeout - diffWithNow(lock.lockedAt) });
+      }
+      else if (secondsLeft !== -1) {
+        this.setState({ secondsLeft: -1 });
       }
     }
   }

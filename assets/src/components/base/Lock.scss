@@ -101,6 +101,22 @@
   margin-left: 10px;
 }
 
+.Lock-timer {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.Lock-timerCounter {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.Lock-timerLabel {
+  display: block;
+  font-weight: normal;
+  font-size: 13px;
+}
+
 @each $color in $lockColors {
   .Lock-usersUser--color#{index($lockColors, $color)} {
     border-color: $color;

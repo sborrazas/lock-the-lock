@@ -2,6 +2,7 @@ import React from "react";
 import { MouseEvent } from "react";
 
 import { cssClasses } from "../../helpers/css";
+import { format as formatTime } from "../../utils/dates";
 
 import "./Lock.scss";
 
@@ -17,6 +18,7 @@ type LockProps = {
   selectedId: number | null;
   onClick: () => void;
   lockUrl: string;
+  secondsLeft: number | null;
 };
 
 class Lock extends React.Component<LockProps> {
@@ -28,7 +30,7 @@ class Lock extends React.Component<LockProps> {
   }
 
   render() {
-    const { items, selectedId, label } = this.props;
+    const { items, selectedId, label, secondsLeft } = this.props;
     const selectedItem = selectedId ? items.find(i => i.id === selectedId) : null;
     const topPathClasses: Record<string, boolean> = {
       "Lock-topPath": true,
@@ -43,8 +45,19 @@ class Lock extends React.Component<LockProps> {
       bottomPathClasses[`Lock-bottomPath--color${selectedItem.colorNumber}`] = true;
     }
 
+    const timeCounter = secondsLeft ? (secondsLeft === -1 ? "-": formatTime(secondsLeft)) : null;
+
     return (
       <div className="Lock">
+        {
+          secondsLeft &&
+            (
+              <div className="Lock-timer">
+                <span className="Lock-timerLabel">Time left</span>
+                <span className="Lock-timerCounter">{timeCounter}</span>
+              </div>
+            )
+        }
         <svg className="Lock-svg"
              height="100%"
              viewBox="0 0 97 97"

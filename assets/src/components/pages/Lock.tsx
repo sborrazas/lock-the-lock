@@ -17,7 +17,7 @@ import {
   Nav as FormNav
 } from "../base/Form";
 import Button from "../base/Button";
-import Donut from "../base/Donut";
+import UiLock from "../base/Lock";
 import Teleprompter, {
   Item as TeleprompterItem
 } from "../base/Teleprompter";
@@ -51,11 +51,13 @@ const serializeUsers = (users: Array<User>) => users.map(({ id, number, username
 const FAKE_USERS = [
   { id: 1, number: 1, username: "aalice" },
   { id: 2, number: 39, username: "bbob" },
-  { id: 3, number: 22, username: "mark" },
-  { id: 4, number: 54, username: "john.doe" },
-  { id: 5, number: 50, username: "pepe" },
-  { id: 6, number: 8, username: "pepe" },
-  { id: 7, number: 15, username: "pepe" }
+  { id: 3, number: 22, username: "markus.dokus" },
+  { id: 4, number: 54, username: "john" },
+  { id: 5, number: 50, username: "susan" },
+  { id: 6, number: 8, username: "Mr. x" },
+  { id: 7, number: 15, username: "not.sure" },
+  { id: 8, number: 31, username: "blueadam" },
+  { id: 9, number: 34, username: "terminator" }
 ];
 
 const SERIALIZED_FAKE_USERS = serializeUsers(FAKE_USERS);
@@ -121,10 +123,8 @@ class Lock extends React.Component<Props> {
     const { lock, lockSettingsForm, match: { params: { lockId } }, history, lockSubscribe } = this.props;
     let modal;
     let user;
-    let label = "Locked by john.doe";
+    let label = "Locked by john";
     let logs: Array<Log> = FAKE_LOGS;
-
-    console.log("RENDERING LOCK", lock);
 
     if (lock.state === LOCK_STATE_LOADING ||
         lock.state === LOCK_STATE_UNINITIALIZED ||
@@ -171,7 +171,7 @@ class Lock extends React.Component<Props> {
     return (
       <Root title={`Lock ${lockId}`} modal={modal} user={user}>
         <LayoutSection>
-          <Donut label={label} items={users} selectedId={selectedId} onClick={this._onLock} />
+          <UiLock label={label} items={users} selectedId={selectedId} onClick={this._onLock} />
         </LayoutSection>
         <LayoutAside>
           <Teleprompter itemsCount={logs.length}>

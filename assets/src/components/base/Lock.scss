@@ -1,0 +1,101 @@
+@import "./mixins";
+@import "./variables";
+
+.Lock {
+  position: relative;
+}
+
+.Lock-svg {
+  display: block;
+  padding: 30px 30%;
+}
+
+.Lock-pathGroup {
+}
+
+/*
+.Lock-pathGroup:active {
+  transform: scale(0.9);
+  transform-origin: center;
+}
+
+.Lock-pathGroup:hover .Lock-topPath {
+  cursor: pointer;
+  stroke: red;
+}
+
+.Lock-pathGroup:hover .Lock-bottomPath {
+  cursor: pointer;
+  fill: red;
+}
+*/
+
+.Lock-topPath {
+  stroke: #FFFFFF;
+  stroke-dasharray: 100%;
+  stroke-dashoffset: 0;
+  animation: unlock 1s ease-in-out both;
+}
+
+.Lock-topPath--locked {
+  animation: lock 1s ease-in-out both;
+  stroke-dashoffset: 40%;
+}
+
+@include custom-colors("Lock-topPath", "stroke");
+
+.Lock-bottomPath {
+  fill: #FFFFFF;
+}
+
+@include custom-colors("Lock-bottomPath", "fill");
+
+.Lock-content {
+  text-align: center;
+}
+
+.Lock-label {
+  background: $Lock-label--backgroundColor;
+  border: 3px solid $Lock-label--borderColor;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: bold;
+  margin-bottom: 20px;
+  padding: 20px 30px;
+  text-transform: uppercase;
+}
+
+.Lock-users {
+}
+
+.Lock-usersUser {
+  background: red;
+  border: 3px solid transparent;
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 0 10px 10px 10px;
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 1.15em; /* 15  / 13 */
+  user-select: none;
+}
+
+.Lock-usersUser--selected:after {
+  content: "\01F511";
+  margin-left: 10px;
+}
+
+@each $color in $lockColors {
+  .Lock-usersUser--color#{index($lockColors, $color)} {
+    border-color: $color;
+    background-color: adjust-color($color, $alpha: -0.2);
+  }
+}
+
+@media (max-width: 641px) {
+  /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+  .Lock-usersUser {
+    font-size: 1.08em;
+  }
+}

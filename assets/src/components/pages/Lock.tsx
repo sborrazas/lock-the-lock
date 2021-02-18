@@ -139,7 +139,6 @@ class Lock extends React.Component<Props, LockState> {
     const { lock, lockSettingsForm, match: { params: { lockId } }, history, lockSubscribe } = this.props;
     let modal;
     let user;
-    let label = "Locked by john";
     let logs: Array<Log> = FAKE_LOGS;
     const { secondsLeft } = this.state;
 
@@ -165,17 +164,6 @@ class Lock extends React.Component<Props, LockState> {
         user = { colorNumber: userTmp.number, username: userTmp.username };
       }
 
-      if (lock.lockedBy) {
-        const lockedByTmp = lock.users.find(({ id }) => id === lock.lockedBy);
-
-        if (lockedByTmp) {
-          label = lock.lockedBy === lock.userId ? "Unlock" : `Locked by ${lockedByTmp.username}`;
-        }
-      }
-      else {
-        label = "Lock";
-      }
-
       logs = lock.logs;
     }
     else if (lock.state === LOCK_STATE_INITIALIZED) {
@@ -186,12 +174,10 @@ class Lock extends React.Component<Props, LockState> {
     const selectedId = lock.state === LOCK_STATE_SUCCESS ? lock.lockedBy : FAKE_SELECTED_ID;
 
     return (
-      <Root title={`Lock ${lockId}`} modal={modal} user={user}>
+      <Root title={`Lock ${lockId}`} modal={modal} user={user} lockUrl={window.location.href}>
         <LayoutSection>
           <UiLock
             secondsLeft={secondsLeft}
-            label={label}
-            lockUrl={window.location.href}
             items={users}
             selectedId={selectedId}
             onClick={this._onLock} />

@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+import { cssClasses } from "../../helpers/css";
+
 import { Content as LayoutContent } from "./Layout";
-// import { cssClasses } from "../../helpers/css";
 
 import "./MainHeader.scss";
 
@@ -43,11 +44,17 @@ const Nav = ({ children }: NavProps) => {
 
 type NavItemProps = {
   children: React.ReactNode;
+  separate?: boolean;
 };
 
-const NavItem = ({ children }: NavItemProps) => {
+const NavItem = ({ children, separate }: NavItemProps) => {
+  const className = cssClasses({
+    "MainHeader-navItem": true,
+    "MainHeader-navItem--separate": !!separate
+  });
+
   return (
-    <div className="MainHeader-navItem">
+    <div className={className}>
       {children}
     </div>
   );

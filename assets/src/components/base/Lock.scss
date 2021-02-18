@@ -1,7 +1,7 @@
-@import "./mixins";
 @import "./variables";
 
 .Lock {
+  margin-bottom: 20px;
   position: relative;
 }
 
@@ -11,73 +11,41 @@
 }
 
 .Lock-pathGroup {
+  cursor: pointer;
 }
 
-/*
 .Lock-pathGroup:active {
   transform: scale(0.9);
   transform-origin: center;
 }
 
+.Lock-pathGroup:hover {
+  opacity: 0.8;
+}
+
 .Lock-pathGroup:hover .Lock-topPath {
   cursor: pointer;
-  stroke: red;
 }
 
 .Lock-pathGroup:hover .Lock-bottomPath {
   cursor: pointer;
-  fill: red;
 }
-*/
 
 .Lock-topPath {
   stroke: #FFFFFF;
   stroke-dasharray: 100%;
-  stroke-dashoffset: 0;
-  animation: unlock 1s ease-in-out both;
 }
 
 .Lock-topPath--locked {
-  animation: lock 1s ease-in-out both;
-  stroke-dashoffset: 40%;
+  animation: lock 1s ease-in-out forwards;
 }
 
-@include custom-colors("Lock-topPath", "stroke");
+.Lock-topPath--unlocked {
+  animation: unlock 1s ease-in-out forwards;
+}
 
 .Lock-bottomPath {
   fill: #FFFFFF;
-}
-
-@include custom-colors("Lock-bottomPath", "fill");
-
-.Lock-nav {
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.Lock-navItem {
-  margin: 0 10px;
-}
-
-.Lock-label {
-  background: $Lock-label--backgroundColor;
-  border: 3px solid $Lock-label--borderColor;
-  border-radius: 50%;
-  cursor: pointer;
-  display: inline-block;
-  font-weight: bold;
-  margin-bottom: 20px;
-  padding: 20px 30px;
-  text-transform: uppercase;
-}
-
-.Lock-share {
-  background: $Lock-label--backgroundColor;
-  border: 3px solid $Lock-label--borderColor;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-block;
-  padding: 10px;
 }
 
 .Lock-users {
@@ -104,6 +72,7 @@
 .Lock-timer {
   margin-bottom: 10px;
   text-align: center;
+  user-select: none;
 }
 
 .Lock-timerCounter {
@@ -128,5 +97,23 @@
   /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
   .Lock-usersUser {
     font-size: 1.08em;
+  }
+}
+
+@keyframes lock {
+  from {
+    stroke-dashoffset: 40%;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes unlock {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 40%;
   }
 }

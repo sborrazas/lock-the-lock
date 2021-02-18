@@ -56,7 +56,7 @@ jobs:
 
     - name: Setup ECR
       run: |
-        $(aws ecr get-login-password --no-include-email)
+        $(aws ecr get-login-password)
 
     - name: Build and tag the image
       run: |

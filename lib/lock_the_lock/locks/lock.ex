@@ -126,7 +126,7 @@ defmodule LockTheLock.Locks.Lock do
 
   def handle_call({:acquire_lock, user_id}, _from, %State{locked_by: nil, timeout: timeout} = state) do
     locked_at = DateTime.utc_now()
-    tref = :timer.send_after(timeout * 1_000, :lock_timeout)
+    {:ok, tref} = :timer.send_after(timeout * 1_000, :lock_timeout)
 
     {:reply, {:ok, locked_at}, %State{state | locked_by: user_id, locked_at: locked_at, timer: tref}}
   end

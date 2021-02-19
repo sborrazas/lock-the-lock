@@ -63,7 +63,9 @@
     justify-content: center;
   }
   .MainHeader-navItem {
-    margin: 10px;
+    border-right: none;
+    margin: 5px;
+    padding-right: 0;
     text-align: center;
   }
 }
